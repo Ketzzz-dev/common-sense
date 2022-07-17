@@ -1,7 +1,7 @@
 
 import { APIApplicationCommandOption, RESTPostAPIApplicationCommandsJSONBody } from "discord-api-types/v10";
 import { CommandInteraction, PermissionResolvable, Permissions } from "discord.js";
-import { TSClient } from "./Client";
+import { CommonSenseClient } from "./Client";
 
 /**
  * The configuration object to pass in the Command constructor.
@@ -38,7 +38,7 @@ export class Command {
      */
     public constructor(
         config: ICommandConfig,
-        public readonly execute: (client: TSClient, interaction: CommandInteraction<'cached'>) => void
+        public readonly execute: (client: CommonSenseClient, interaction: CommandInteraction<'cached'>) => void
     ) {
         this.name = config.name
         this.category = config.category

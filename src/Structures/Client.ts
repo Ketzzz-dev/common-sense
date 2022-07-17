@@ -11,7 +11,7 @@ import Logger from '../util/Logger'
 /**
  * The client class.
  */
-export class TSClient extends Client<true> { // explicitly passing `true` here so that we will be able to access all of the properties and methods without having to call `#isReady()`.
+export class CommonSenseClient extends Client<true> { // explicitly passing `true` here so that we will be able to access all of the properties and methods without having to call `#isReady()`.
     public readonly commands = new Collection<string, Command>()
 
     public constructor() {
