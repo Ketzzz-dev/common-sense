@@ -5,6 +5,7 @@ declare global {
         interface ProcessEnv {
             // bot secrets
             BOT_TOKEN: string
+            MONGO_URI: string
 
             // development environment
             MODE: 'dev' | 'prod' // 'dev' mode will register the commands to {GUILD_ID} (your test server). While 'prod' will register commands to the application itself.

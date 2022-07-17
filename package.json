@@ -1,7 +1,7 @@
 {
-  "name": "discord.js-template-typescript",
+  "name": "common-sense",
   "version": "1.0.1",
-  "description": "A little template for developing Discord bots in Typescript.",
+  "description": "A silly little moderation bot with modern features.",
   "main": "dist/index.js",
   "scripts": {
     "start": "ts-node-dev src/index.ts",
@@ -23,6 +23,7 @@
     "discord-api-types": "^0.35.0",
     "discord.js": "^13.8.1",
     "dotenv": "^16.0.1",
+    "mongoose": "^6.4.4",
     "winston": "^3.8.1"
   },
   "devDependencies": {

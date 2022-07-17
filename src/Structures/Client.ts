@@ -7,6 +7,7 @@ import { defaultImport } from "../util/FS";
 import { Command } from "./Command";
 import { Event } from "./Event";
 import Logger from '../util/Logger'
+import { connect } from 'mongoose'
 
 /**
  * The client class.
@@ -109,10 +110,19 @@ export class CommonSenseClient extends Client<true> { // explicitly passing `tru
     /**
      * Launches the client.
      */
-    public start(): void {
-        // register events and commands.
-        Promise.all([this.registerEvents(), this.registerCommands()])
-            .then(() => this.login(process.env.BOT_TOKEN!)) // login once we've registered everything.
-            .catch(console.error) // catch in case anything goes wrong.
+    public async start(): Promise<void> {
+        await this.registerEvents()
+        await this.registerCommands()
+        
+        try {
+            await connect(process.env.MONGO_URI!)
+
+            Logger.info('Successfully connected to the database!')
+
+            await this.login(process.env.BOT_TOKEN!)
+        } catch (error) {
+            Logger.error('Unable to connect to database')
+            Logger.error(error)
+        }
     }
 }
