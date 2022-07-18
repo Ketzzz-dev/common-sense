@@ -1,7 +1,7 @@
 
-import { APIApplicationCommandOption, RESTPostAPIApplicationCommandsJSONBody } from "discord-api-types/v10";
-import { CommandInteraction, PermissionResolvable, Permissions } from "discord.js";
-import { CommonSenseClient } from "./Client";
+import { APIApplicationCommandOption, RESTPostAPIApplicationCommandsJSONBody } from "discord-api-types/v10"
+import { CommandInteraction, PermissionResolvable, Permissions } from "discord.js"
+import { CommonSenseClient } from "./Client"
 
 /**
  * The configuration object to pass in the Command constructor.
@@ -45,11 +45,9 @@ export class Command {
         this.description = config.description
 
         this.options = config.options ?? []
-
-        // uses the default permission flags if `config.permission` is null.
         this.permissions = Permissions.resolve(config.permissions ?? Permissions.DEFAULT).toString() as `${bigint}`
     }
-    
+
     /**
      * Converts the command to JSON.
      */
