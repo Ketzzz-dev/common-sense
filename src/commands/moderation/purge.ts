@@ -1,11 +1,12 @@
 import { ApplicationCommandOptionType, PermissionFlagsBits } from 'discord-api-types/v10'
 import { MessageEmbed } from 'discord.js'
 import { Command } from '../../Structures/Command'
+import { MODERATOR } from '../../util/Permissions'
 
 export default new Command({
     name: 'purge', category: 'moderation',
     description: 'Deletes `amount` messages from the channel or `target` if provided.',
-    permissions: [PermissionFlagsBits.ManageMessages],
+    permissions: MODERATOR,
     options: [
         {
             type: ApplicationCommandOptionType.Integer,
@@ -23,7 +24,7 @@ export default new Command({
     let amount = options.getInteger('amount', true)
     let target = options.getUser('target')
 
-    let messages = await channel!.messages.fetch({ limit: target ? amount + 1 : amount }) // for some reason, it deletes one message less if `target` is specified.
+    let messages = await channel!.messages.fetch({ limit: amount }) // for some reason, it deletes one message less if `target` is specified.
     
     if (target) {
         let { id } = target

@@ -1,12 +1,13 @@
 import { ApplicationCommandOptionType, PermissionFlagsBits } from 'discord-api-types/v10'
 import { Command } from '../../Structures/Command'
 import { MessageEmbed } from 'discord.js'
+import { ADMINISTRATOR, MODERATOR } from '../../util/Permissions'
 import ms from 'ms'
 
 export default new Command({
     name: 'timeout', category: 'moderation',
     description: 'Times `target` out for `time`.',
-    permissions: [PermissionFlagsBits.ModerateMembers],
+    permissions: MODERATOR,
     options: [
         {
             type: ApplicationCommandOptionType.User,
@@ -35,7 +36,7 @@ export default new Command({
         return await interaction.reply({ content: 'You cannot time yourself out, silly.', ephemeral: true })
     if (target.id == clientUser.id)
         return await interaction.reply({ content: 'You cannot time me out, silly.', ephemeral: true })
-    if (target.permissions.has(PermissionFlagsBits.ModerateMembers))
+    if (target.permissions.has(MODERATOR | ADMINISTRATOR))
         return await interaction.reply({ content: 'You cannot time members out with the same or higher permissions as you.', ephemeral: true })
     
     let timeoutLength

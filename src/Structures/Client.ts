@@ -18,7 +18,8 @@ export class CommonSenseClient extends Client<true> {
     public constructor() {
         super({
             intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers],
-            allowedMentions: { repliedUser: false }
+            allowedMentions: { repliedUser: false },
+            presence: { activities: [{ name: 'Weezer', type: 'LISTENING' }] }
         })
     }
 
