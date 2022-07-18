@@ -1,13 +1,13 @@
 import { REST } from "@discordjs/rest"
-import { Routes } from "discord-api-types/v10"
-import { Client, Collection, Intents } from "discord.js"
+import { GatewayIntentBits, Routes } from "discord-api-types/v10"
+import { Client, Collection } from "discord.js"
 import { readdir } from "fs/promises"
 import { join } from "path"
 import { defaultImport } from "../util/FS"
 import { Command } from "./Command"
 import { Event } from "./Event"
-import Logger from '../util/Logger'
 import { connect } from 'mongoose'
+import Logger from '../util/Logger'
 
 /**
  * The client class.
@@ -17,7 +17,7 @@ export class CommonSenseClient extends Client<true> {
 
     public constructor() {
         super({
-            intents: Intents.FLAGS.GUILDS | Intents.FLAGS.GUILD_MESSAGES,
+            intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers],
             allowedMentions: { repliedUser: false }
         })
     }
