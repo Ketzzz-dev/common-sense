@@ -1,5 +1,4 @@
-import { ApplicationCommandOptionType } from 'discord-api-types/v10'
-import { MessageEmbed } from 'discord.js'
+import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import { Command } from '../../Structures/Command'
 import { MODERATOR } from '../../Util/Permissions'
 
@@ -24,7 +23,7 @@ export default new Command({
     let amount = options.getInteger('amount', true)
     let target = options.getUser('target')
 
-    let messages = await channel!.messages.fetch({ limit: amount }) // for some reason, it deletes one message less if `target` is specified.
+    let messages = await channel!.messages.fetch({ limit: amount })
     
     if (target) {
         let { id } = target
@@ -36,11 +35,10 @@ export default new Command({
 
     await interaction.reply({
         embeds: [
-            new MessageEmbed({
-                title: 'Messages purged!', color: 'BLUE',
-                description: target ? `Purged ${size} messages from ${target.toString()}.` : `Purged ${size} from this channel.`,
-                footer: { text: `Moderator: ${user.tag}` }
-            })
+            new EmbedBuilder()
+                .setTitle('Messages Purged!').setColor('Blue')
+                .setDescription(target ? `Purged ${size} messages from ${target.toString()}.` : `Purged ${size} from this channel.`)
+                .setFooter({ text: `Moderator: ${user.tag}` })
         ]
     })
     

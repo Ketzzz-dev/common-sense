@@ -3,18 +3,18 @@ import { Command } from '../../Structures/Command'
 import { MODERATOR } from '../../Util/Permissions'
 
 export default new Command({
-    name: 'ban', category: 'moderation',
-    description: 'Bans `target` from the server.',
+    name: 'kick', category: 'moderation',
+    description: 'Kicks `target` from the server.',
     permissions: MODERATOR,
     options: [
         {
             type: ApplicationCommandOptionType.User,
-            name: 'target', description: 'The target user to ban.',
+            name: 'target', description: 'The target user to kick.',
             required: true
         },
         {
             type: ApplicationCommandOptionType.String,
-            name: 'reason', description: 'The reason this user was banned.'
+            name: 'reason', description: 'The reason this user was kicked.'
         }
     ]
 }, async (client, interaction) => {
@@ -26,25 +26,25 @@ export default new Command({
     if (!target)
         return await interaction.reply({ content: 'Unknown user.', ephemeral: true })
     else if (target.id == user.id)
-        return await interaction.reply({ content: 'You cannot ban yourself, silly.', ephemeral: true })
+        return await interaction.reply({ content: 'You cannot kick yourself, silly.', ephemeral: true })
     else if (target.id == client.user.id)
-        return await interaction.reply({ content: 'You cannot ban me, silly.', ephemeral: true })
+        return await interaction.reply({ content: 'You cannot kick me, silly.', ephemeral: true })
     else if (target.permissions.has(MODERATOR))
-        return await interaction.reply({ content: 'You cannot ban members with the same or higher permissions as you.', ephemeral: true })
+        return await interaction.reply({ content: 'You cannot kick members with the same or higher permissions as you.', ephemeral: true })
 
     await target.send({
         embeds: [
             new EmbedBuilder()
-                .setTitle(`You were banned from **${guild.name}**!`).setColor('DarkButNotBlack')
+                .setTitle(`You were kicked from **${guild.name}**!`).setColor('DarkButNotBlack')
                 .setDescription(`**Reason**: ${reason}`)
                 .setFooter({ text: `Moderator: ${user.tag}` })
         ]
     })
-    await target.ban({ deleteMessageDays: 7, reason })
+    await target.kick(reason)
     await target.send({
         embeds: [
             new EmbedBuilder()
-                .setTitle(`**${target.user.tag}** was banned!`).setColor('Blue')
+                .setTitle(`**${target.user.tag}** was kicked!`).setColor('Blue')
                 .setDescription(`**Reason**: ${reason}`)
                 .setFooter({ text: `Moderator: ${user.tag}` })
         ]

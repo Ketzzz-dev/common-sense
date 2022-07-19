@@ -1,7 +1,6 @@
-import { PermissionFlagsBits } from 'discord-api-types/v10'
-import { Permissions } from 'discord.js'
+import { PermissionFlagsBits, PermissionsBitField } from 'discord.js'
 
-export const MODERATOR = Permissions.resolve([
+export const MODERATOR = PermissionsBitField.resolve([
     PermissionFlagsBits.BanMembers, PermissionFlagsBits.ChangeNickname,
     PermissionFlagsBits.DeafenMembers, PermissionFlagsBits.KickMembers,
     PermissionFlagsBits.ManageMessages, PermissionFlagsBits.ManageNicknames,
@@ -9,4 +8,4 @@ export const MODERATOR = Permissions.resolve([
     PermissionFlagsBits.MuteMembers, PermissionFlagsBits.PrioritySpeaker,
     PermissionFlagsBits.ViewAuditLog
 ])
-export const ADMINISTRATOR = Permissions.resolve(PermissionFlagsBits.Administrator)
+export const ADMINISTRATOR = PermissionsBitField.resolve(PermissionFlagsBits.Administrator)

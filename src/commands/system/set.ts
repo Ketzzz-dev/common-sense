@@ -1,5 +1,4 @@
-import { ApplicationCommandOptionType, ChannelType } from 'discord-api-types/v10'
-import { MessageEmbed } from 'discord.js'
+import { ApplicationCommandOptionType, ChannelType, EmbedBuilder } from 'discord.js'
 import { IChannelSettings, IRoleSettings } from '../../models/GuildSettings'
 import { Command } from '../../Structures/Command'
 import { getGuildSettings } from '../../Util/DB'
@@ -69,11 +68,10 @@ export default new Command({
 
             await interaction.reply({
                 embeds: [
-                    new MessageEmbed({
-                        title: 'Channel set!', color: 'YELLOW',
-                        description: `${channel.toString()} will now be used as \`${functionality}\`.`,
-                        footer: { text: `Administrator: ${user.tag}` }
-                    })
+                    new EmbedBuilder()
+                        .setTitle('Channel Set!').setColor('Yellow')
+                        .setDescription(`${channel} will now be used as \`${functionality}\``)
+                        .setFooter({ text: `Administrator: ${user.tag}` })
                 ]
             })
 
@@ -97,11 +95,10 @@ export default new Command({
 
             await interaction.reply({
                 embeds: [
-                    new MessageEmbed({
-                        title: 'Role set!', color: 'YELLOW',
-                        description: `${role.toString()} will now be identified as \`${functionality}\`.`,
-                        footer: { text: `Administrator: ${user.tag}` }
-                    })
+                    new EmbedBuilder()
+                        .setTitle('Channel Set!').setColor('Yellow')
+                        .setDescription(`${role} will now be identified as \`${functionality}\``)
+                        .setFooter({ text: `Administrator: ${user.tag}` })
                 ]
             })
 

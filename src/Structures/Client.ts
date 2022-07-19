@@ -1,6 +1,5 @@
 import { REST } from "@discordjs/rest"
-import { GatewayIntentBits, Routes } from "discord-api-types/v10"
-import { Client, Collection } from "discord.js"
+import { ActivityType, Client, Collection, GatewayIntentBits, Partials, Routes } from "discord.js"
 import { readdir } from "fs/promises"
 import { join } from "path"
 import { defaultImport } from "../Util/FS"
@@ -22,8 +21,8 @@ export class CommonSenseClient extends Client<true> {
                 GatewayIntentBits.GuildWebhooks
             ],
             allowedMentions: { repliedUser: false },
-            partials: ['MESSAGE'],
-            presence: { activities: [{ name: 'Weezer', type: 'LISTENING' }] }
+            partials: [Partials.Message],
+            presence: { activities: [{ name: 'Weezer', type: ActivityType.Listening }] }
         })
     }
 

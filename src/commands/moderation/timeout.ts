@@ -1,8 +1,7 @@
-import { ApplicationCommandOptionType } from 'discord-api-types/v10'
 import { Command } from '../../Structures/Command'
-import { MessageEmbed } from 'discord.js'
 import { MODERATOR } from '../../Util/Permissions'
 import ms from 'ms'
+import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 
 export default new Command({
     name: 'timeout', category: 'moderation',
@@ -25,22 +24,22 @@ export default new Command({
         }
     ]
 }, async (client, interaction) => {
-    let { user: clientUser } = client
-    let { options, guild, user: interactionUser } = interaction
+    let { options, guild, user } = interaction
 
-    let target = options.getMember('target', true)
+    let target = options.getMember('target')
     let time = options.getString('time', true)
     let reason = options.getString('reason') ?? 'No reason provided.'
 
-    if (target.id == interactionUser.id)
+    if (!target)
+        return await interaction.reply({ content: 'Unknown user.', ephemeral: true })
+    else if (target.id == user.id)
         return await interaction.reply({ content: 'You cannot time yourself out, silly.', ephemeral: true })
-    if (target.id == clientUser.id)
+    else if (target.id == client.user.id)
         return await interaction.reply({ content: 'You cannot time me out, silly.', ephemeral: true })
-    if (target.permissions.has(MODERATOR))
+    else if (target.permissions.has(MODERATOR))
         return await interaction.reply({ content: 'You cannot time members out with the same or higher permissions as you.', ephemeral: true })
-    
-    let timeoutLength
 
+    let timeoutLength
     try {
         timeoutLength = ms(time)
     } catch (error) {
@@ -49,21 +48,19 @@ export default new Command({
 
     await target.send({
         embeds: [
-            new MessageEmbed({
-                title: `You were timed out in **${guild.name}** for ${ms(timeoutLength, { long: true })}!`, color: 'DARK_BUT_NOT_BLACK',
-                description: `**Reason**: ${reason}`,
-                footer: { text: `Moderator: ${interactionUser.tag}` }
-            })
+            new EmbedBuilder()
+                .setTitle(`You were timed out from **${guild.name}** for **${ms(timeoutLength, { long: true })}**!`).setColor('DarkButNotBlack')
+                .setDescription(`**Reason**: ${reason}`)
+                .setFooter({ text: `Moderator: ${user.tag}` })
         ]
     })
     await target.timeout(timeoutLength, reason)
-    await interaction.reply({
+    await target.send({
         embeds: [
-            new MessageEmbed({
-                title: `**${target.user.tag}** was timed out for ${ms(timeoutLength, { long: true })}!`, color: 'BLUE',
-                description: `**Reason**: ${reason}`,
-                footer: { text: `Moderator: ${interactionUser.tag}` }
-            })
+            new EmbedBuilder()
+                .setTitle(`**${target.user.tag}** was timed out for **${ms(timeoutLength, { long: true })}**!`).setColor('Blue')
+                .setDescription(`**Reason**: ${reason}`)
+                .setFooter({ text: `Moderator: ${user.tag}` })
         ]
     })
 })

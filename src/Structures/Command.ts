@@ -1,6 +1,4 @@
-
-import { APIApplicationCommandOption, RESTPostAPIApplicationCommandsJSONBody } from "discord-api-types/v10"
-import { CommandInteraction, PermissionResolvable, Permissions } from "discord.js"
+import { PermissionsBitField, APIApplicationCommandOption, PermissionResolvable, RESTPostAPIApplicationCommandsJSONBody, ChatInputCommandInteraction } from "discord.js"
 import { CommonSenseClient } from "./Client"
 
 /**
@@ -37,14 +35,14 @@ export class Command {
      */
     public constructor(
         config: ICommandConfig,
-        public readonly execute: (client: CommonSenseClient, interaction: CommandInteraction<'cached'>) => void
+        public readonly execute: (client: CommonSenseClient, interaction: ChatInputCommandInteraction<'cached'>) => void
     ) {
         this.name = config.name
         this.category = config.category
         this.description = config.description
 
         this.options = config.options ?? []
-        this.permissions = Permissions.resolve(config.permissions ?? Permissions.DEFAULT).toString() as `${bigint}`
+        this.permissions = PermissionsBitField.resolve(config.permissions ?? PermissionsBitField.Default).toString() as `${bigint}`
     }
 
     /**
