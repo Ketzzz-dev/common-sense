@@ -1,6 +1,7 @@
-import { ChannelType, EmbedBuilder } from 'discord.js'
+import { AuditLogEvent, ChannelType, EmbedBuilder } from 'discord.js'
 import { Event } from '../Structures/Event'
 import { getGuildSettings } from '../Util/DB'
+import { sendWebhook } from '../Util/Webhooks'
 
 export default new Event('messageDelete', async (client, deletedMessage) => {
     let { user } = client
@@ -8,7 +9,7 @@ export default new Event('messageDelete', async (client, deletedMessage) => {
     if (!deletedMessage.inGuild())
         return
     
-    let { guild, content, author, channel } = deletedMessage
+    let { guild, content, channel, author } = deletedMessage
     
     let settings = await getGuildSettings(guild.id)
     let activityLogs = guild.channels.cache.get(settings.channels.activity_logs)
@@ -16,21 +17,19 @@ export default new Event('messageDelete', async (client, deletedMessage) => {
     if (activityLogs?.type != ChannelType.GuildText)
         return
 
-    let webhook = await activityLogs.createWebhook({
-        name: user.username,
-        avatar: user.displayAvatarURL({ extension: 'png', size: 1024 })
-    })
+    let auditLogs = await guild.fetchAuditLogs({ limit: 7, type: AuditLogEvent.MessageDelete })
+    let entry = auditLogs.entries.find(entry => entry.target.id == author.id && entry.extra.channel.id == channel.id)
+    let perpetrator = entry?.executor ? entry.executor : author
 
-    let deletedContent = content.length > 1024 ? content.slice(0, 1021) + '...' : content
+    let deletedContent = content.length > 1024 ? content.slice(0, 1021) + '...' : content || 'None'
 
-    await webhook.send({
+    await sendWebhook(user, activityLogs, {
         embeds: [
             new EmbedBuilder()
                 .setTitle('Message Deleted!').setColor('Blurple')
-                .setDescription(`${author} deleted their message in ${channel}`)
+                .setDescription(`${perpetrator} deleted a message in ${channel}`)
                 .addFields({ name: 'Deleted Content', value: deletedContent })
                 .setTimestamp()
         ]
     })
-    await webhook.delete()
 })

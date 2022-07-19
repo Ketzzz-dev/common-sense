@@ -1,4 +1,4 @@
-import { EmbedBuilder, time } from 'discord.js'
+import { EmbedBuilder, Formatters } from 'discord.js'
 import { Command } from '../../Structures/Command'
 
 export default new Command({
@@ -20,7 +20,7 @@ export default new Command({
                         value: `**API**: \`${ws.ping} ms\`, **Bot**: \`${sentMessage.createdTimestamp - interaction.createdTimestamp} ms\``,
                         inline: true
                     },
-                    { name: 'Uptime', value: time(readyAt, 'R'), inline: true }
+                    { name: 'Uptime', value: Formatters.time(readyAt, 'R'), inline: true }
                 )
                 .setFooter({ text: `User: ${interaction.user.tag}`})
         ]

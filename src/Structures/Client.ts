@@ -1,5 +1,5 @@
 import { REST } from "@discordjs/rest"
-import { ActivityType, Client, Collection, GatewayIntentBits, Partials, Routes } from "discord.js"
+import { ActivityType, Client, Collection, GatewayIntentBits, IntentsBitField, Partials, Routes } from "discord.js"
 import { readdir } from "fs/promises"
 import { join } from "path"
 import { defaultImport } from "../Util/FS"
@@ -18,7 +18,7 @@ export class CommonSenseClient extends Client<true> {
         super({
             intents: [
                 GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers,
-                GatewayIntentBits.GuildWebhooks
+                GatewayIntentBits.GuildWebhooks, GatewayIntentBits.MessageContent
             ],
             allowedMentions: { repliedUser: false },
             partials: [Partials.Message],
@@ -109,7 +109,7 @@ export class CommonSenseClient extends Client<true> {
             await this.login(process.env.BOT_TOKEN!)
         } catch (error) {
             Logger.error('Unable to connect to database')
-            Logger.error(error)
+            console.error(error)
         }
     }
 }

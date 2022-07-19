@@ -2,6 +2,7 @@ import { Command } from '../../Structures/Command'
 import { MODERATOR } from '../../Util/Permissions'
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import ms from 'ms'
+import GuildEvents from '../../Util/GuildEvents'
 
 export default new Command({
     name: 'timeout', category: 'moderation',
@@ -24,7 +25,7 @@ export default new Command({
         }
     ]
 }, async (client, interaction) => {
-    let { options, guild, user } = interaction
+    let { options, guild, user, member } = interaction
 
     let target = options.getMember('target')
     let time = options.getString('time', true)
@@ -56,7 +57,7 @@ export default new Command({
         ]
     })
     await target.timeout(timeoutLength, reason)
-    await target.send({
+    await interaction.reply({
         embeds: [
             new EmbedBuilder()
                 .setTitle(`**${target.user.tag}** was timed out for **${ms(timeoutLength, { long: true })}**!`).setColor('Blue')
@@ -64,4 +65,6 @@ export default new Command({
                 .setFooter({ text: `Moderator: ${user.tag}` })
         ]
     })
+
+    GuildEvents.emit('modTimeout', guild, member, target, timeoutLength, reason)
 })

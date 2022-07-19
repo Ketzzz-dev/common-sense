@@ -35,7 +35,7 @@ export class Command {
      */
     public constructor(
         config: ICommandConfig,
-        public readonly execute: (client: CommonSenseClient, interaction: ChatInputCommandInteraction<'cached'>) => void
+        public readonly execute: (client: CommonSenseClient, interaction: ChatInputCommandInteraction<'cached'>) => Promise<any>
     ) {
         this.name = config.name
         this.category = config.category

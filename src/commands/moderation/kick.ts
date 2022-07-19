@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import { Command } from '../../Structures/Command'
+import GuildEvents from '../../Util/GuildEvents'
 import { MODERATOR } from '../../Util/Permissions'
 
 export default new Command({
@@ -18,7 +19,7 @@ export default new Command({
         }
     ]
 }, async (client, interaction) => {
-    let { options, guild, user } = interaction
+    let { options, guild, user, member } = interaction
 
     let target = options.getMember('target')
     let reason = options.getString('reason') ?? 'No reason provided.'
@@ -41,7 +42,7 @@ export default new Command({
         ]
     })
     await target.kick(reason)
-    await target.send({
+    await interaction.reply({
         embeds: [
             new EmbedBuilder()
                 .setTitle(`**${target.user.tag}** was kicked!`).setColor('Blue')
@@ -49,4 +50,6 @@ export default new Command({
                 .setFooter({ text: `Moderator: ${user.tag}` })
         ]
     })
+
+    GuildEvents.emit('modKick', guild, member, target, reason)
 })

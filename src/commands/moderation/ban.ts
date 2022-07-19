@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import ms from 'ms'
 import { Command } from '../../Structures/Command'
+import GuildEvents from '../../Util/GuildEvents'
 import { MODERATOR } from '../../Util/Permissions'
 import { setLongTimeout } from '../../Util/Timers'
 
@@ -24,7 +25,7 @@ export default new Command({
         }
     ]
 }, async (client, interaction) => {
-    let { options, guild, user } = interaction
+    let { options, guild, user, member } = interaction
 
     let target = options.getMember('target')
     let time = options.getString('time')
@@ -59,7 +60,7 @@ export default new Command({
 
     let banned = await target.ban({ deleteMessageDays: 7, reason })
 
-    await target.send({
+    await interaction.reply({
         embeds: [
             new EmbedBuilder()
                 .setTitle(`**${banned.user.tag}** was banned!`).setColor('Blue')
@@ -70,4 +71,6 @@ export default new Command({
 
     if (banLength)
         setLongTimeout(() => guild.members.unban(banned.id), banLength)
+
+    GuildEvents.emit('modKick', guild, member, target, reason)
 })

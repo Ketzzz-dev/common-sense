@@ -1,11 +1,13 @@
 import { ChannelType, EmbedBuilder } from 'discord.js'
 import { Event } from '../Structures/Event'
 import { getGuildSettings } from '../Util/DB'
+import { sendWebhook } from '../Util/Webhooks'
+
 
 export default new Event('messageUpdate', async (client, oldMessage, newMessage) => {
     let { user } = client
 
-    if (!oldMessage.inGuild() || !newMessage.inGuild())
+    if (!oldMessage.inGuild() || !newMessage.inGuild() || !newMessage.content)
         return
     
     let settings = await getGuildSettings(oldMessage.guildId)
@@ -13,16 +15,11 @@ export default new Event('messageUpdate', async (client, oldMessage, newMessage)
 
     if (activityLogs?.type != ChannelType.GuildText)
         return
-
-    let webhook = await activityLogs.createWebhook({
-        name: user.username,
-        avatar: user.displayAvatarURL({ extension: 'png', size: 1024 })
-    })
-
-    let oldContent = oldMessage.content.length > 1024 ? oldMessage.content.slice(0, 1021) + '...' : oldMessage.content
+    
+    let oldContent = oldMessage.content.length > 1024 ? oldMessage.content.slice(0, 1021) + '...' : oldMessage.content || 'None'
     let newContent = newMessage.content.length > 1024 ? newMessage.content.slice(0, 1021) + '...' : newMessage.content
 
-    await webhook.send({
+    await sendWebhook(user, activityLogs, {
         embeds: [
             new EmbedBuilder()
                 .setTitle('Message Edited!').setColor('Blurple')
@@ -34,5 +31,4 @@ export default new Event('messageUpdate', async (client, oldMessage, newMessage)
                 .setTimestamp()
         ]
     })
-    await webhook.delete()
 })
