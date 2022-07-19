@@ -1,7 +1,7 @@
-import { ApplicationCommandOptionType, PermissionFlagsBits } from 'discord-api-types/v10'
+import { ApplicationCommandOptionType } from 'discord-api-types/v10'
 import { Command } from '../../Structures/Command'
 import { MessageEmbed } from 'discord.js'
-import { ADMINISTRATOR, MODERATOR } from '../../util/Permissions'
+import { MODERATOR } from '../../Util/Permissions'
 import ms from 'ms'
 
 export default new Command({
@@ -36,7 +36,7 @@ export default new Command({
         return await interaction.reply({ content: 'You cannot time yourself out, silly.', ephemeral: true })
     if (target.id == clientUser.id)
         return await interaction.reply({ content: 'You cannot time me out, silly.', ephemeral: true })
-    if (target.permissions.has(MODERATOR | ADMINISTRATOR))
+    if (target.permissions.has(MODERATOR))
         return await interaction.reply({ content: 'You cannot time members out with the same or higher permissions as you.', ephemeral: true })
     
     let timeoutLength
@@ -47,7 +47,6 @@ export default new Command({
         return await interaction.reply({ content: 'Option `time` is invalid.', ephemeral: true })
     }
 
-    await target.timeout(timeoutLength, reason)
     await target.send({
         embeds: [
             new MessageEmbed({
@@ -57,10 +56,11 @@ export default new Command({
             })
         ]
     })
+    await target.timeout(timeoutLength, reason)
     await interaction.reply({
         embeds: [
             new MessageEmbed({
-                title: `**${target.user.tag}** was timed out for ${ms(timeoutLength, { long: true })}!`, color: 'RED',
+                title: `**${target.user.tag}** was timed out for ${ms(timeoutLength, { long: true })}!`, color: 'BLUE',
                 description: `**Reason**: ${reason}`,
                 footer: { text: `Moderator: ${interactionUser.tag}` }
             })

@@ -1,7 +1,7 @@
-import { ApplicationCommandOptionType, PermissionFlagsBits } from 'discord-api-types/v10'
+import { ApplicationCommandOptionType } from 'discord-api-types/v10'
 import { MessageEmbed } from 'discord.js'
 import { Command } from '../../Structures/Command'
-import { MODERATOR } from '../../util/Permissions'
+import { MODERATOR } from '../../Util/Permissions'
 
 export default new Command({
     name: 'purge', category: 'moderation',
@@ -37,7 +37,7 @@ export default new Command({
     await interaction.reply({
         embeds: [
             new MessageEmbed({
-                title: 'Messages purged!', color: 'RED',
+                title: 'Messages purged!', color: 'BLUE',
                 description: target ? `Purged ${size} messages from ${target.toString()}.` : `Purged ${size} from this channel.`,
                 footer: { text: `Moderator: ${user.tag}` }
             })

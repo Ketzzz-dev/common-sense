@@ -3,11 +3,11 @@ import { GatewayIntentBits, Routes } from "discord-api-types/v10"
 import { Client, Collection } from "discord.js"
 import { readdir } from "fs/promises"
 import { join } from "path"
-import { defaultImport } from "../util/FS"
+import { defaultImport } from "../Util/FS"
 import { Command } from "./Command"
 import { Event } from "./Event"
 import { connect } from 'mongoose'
-import Logger from '../util/Logger'
+import Logger from '../Util/Logger'
 
 /**
  * The client class.
@@ -17,8 +17,12 @@ export class CommonSenseClient extends Client<true> {
 
     public constructor() {
         super({
-            intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers],
+            intents: [
+                GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildWebhooks
+            ],
             allowedMentions: { repliedUser: false },
+            partials: ['MESSAGE'],
             presence: { activities: [{ name: 'Weezer', type: 'LISTENING' }] }
         })
     }

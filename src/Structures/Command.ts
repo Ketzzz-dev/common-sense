@@ -15,7 +15,6 @@ export interface ICommandConfig {
  * The command class.
  */
 export class Command {
-    // some application command properties
     private readonly options: APIApplicationCommandOption[]
     private readonly permissions: `${bigint}`
 
@@ -55,7 +54,7 @@ export class Command {
         return {
             name: this.name, description: this.description,
             options: this.options, default_member_permissions: this.permissions,
-            dm_permission: false // commands are DMs only as of now, since you're most likely going to be running these commands in a test server, but I will add support for DMs in the future!
+            dm_permission: false
         }
     }
 }

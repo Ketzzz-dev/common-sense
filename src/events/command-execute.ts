@@ -1,4 +1,5 @@
 import { Event } from "../Structures/Event"
+import { MODERATOR } from '../Util/Permissions'
 
 const COOLDOWNS = new Set<string>()
 
@@ -20,6 +21,9 @@ export default new Event('interactionCreate', async (client, interaction) => {
         await interaction.reply({ content: 'An error occured whilst executing this command.' })
         console.error(error)
     } finally {
+        if (interaction.member.permissions.has(MODERATOR))
+            return
+
         COOLDOWNS.add(interaction.member.id)
 
         setTimeout(() => COOLDOWNS.delete(interaction.member.id), parseInt(process.env.COMMAND_COOLDOWN!) * 1000)
