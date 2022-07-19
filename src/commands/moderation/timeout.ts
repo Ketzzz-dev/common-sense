@@ -1,7 +1,7 @@
 import { Command } from '../../Structures/Command'
 import { MODERATOR } from '../../Util/Permissions'
-import ms from 'ms'
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
+import ms from 'ms'
 
 export default new Command({
     name: 'timeout', category: 'moderation',
@@ -15,7 +15,7 @@ export default new Command({
         },
         {
             type: ApplicationCommandOptionType.String,
-            name: 'time', description: 'The amount of time to time out.',
+            name: 'time', description: 'The length of the time out.',
             required: true
         },
         {
@@ -40,6 +40,7 @@ export default new Command({
         return await interaction.reply({ content: 'You cannot time members out with the same or higher permissions as you.', ephemeral: true })
 
     let timeoutLength
+    
     try {
         timeoutLength = ms(time)
     } catch (error) {
