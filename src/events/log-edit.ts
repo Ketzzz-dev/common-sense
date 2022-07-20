@@ -17,7 +17,10 @@ export default new Event('messageUpdate', async (client, oldMessage, newMessage)
         return
     
     let oldContent = oldMessage.content.length > 1024 ? oldMessage.content.slice(0, 1021) + '...' : oldMessage.content || 'None'
+    let oldAttachments = oldMessage.attachments.size ? oldMessage.attachments.map(att => att.proxyURL).join('\n') : 'None'
     let newContent = newMessage.content.length > 1024 ? newMessage.content.slice(0, 1021) + '...' : newMessage.content
+    let newAttachments = newMessage.attachments.size ? newMessage.attachments.map(att => att.proxyURL).join('\n') : 'None'
+
 
     await sendWebhook(user, activityLogs, {
         embeds: [
@@ -26,7 +29,9 @@ export default new Event('messageUpdate', async (client, oldMessage, newMessage)
                 .setDescription(`${oldMessage.author} edited their message in ${oldMessage.channel}`)
                 .addFields(
                     { name: 'Old Content', value: oldContent },
-                    { name: 'New Content', value: newContent }
+                    { name: 'Old Attachments', value: oldAttachments },
+                    { name: 'New Content', value: newContent },
+                    { name: 'New Attachments', value: newAttachments }
                 )
                 .setTimestamp()
         ]

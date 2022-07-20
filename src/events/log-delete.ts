@@ -9,7 +9,7 @@ export default new Event('messageDelete', async (client, deletedMessage) => {
     if (!deletedMessage.inGuild())
         return
     
-    let { guild, content, channel, author } = deletedMessage
+    let { guild, content, attachments, channel, author } = deletedMessage
     
     let settings = await getGuildSettings(guild.id)
     let activityLogs = guild.channels.cache.get(settings.channels.activity_logs)
@@ -22,13 +22,18 @@ export default new Event('messageDelete', async (client, deletedMessage) => {
     let perpetrator = entry?.executor ? entry.executor : author
 
     let deletedContent = content.length > 1024 ? content.slice(0, 1021) + '...' : content || 'None'
+    let deletedAttachments = attachments.size ? attachments.map(att => att.proxyURL).join('\n') : 'None'
+
 
     await sendWebhook(user, activityLogs, {
         embeds: [
             new EmbedBuilder()
                 .setTitle('Message Deleted!').setColor('Blurple')
                 .setDescription(`${perpetrator} deleted a message in ${channel}`)
-                .addFields({ name: 'Deleted Content', value: deletedContent })
+                .addFields(
+                    { name: 'Deleted Content', value: deletedContent },
+                    { name: 'Deleted Attachments', value: deletedAttachments }
+                )
                 .setTimestamp()
         ]
     })

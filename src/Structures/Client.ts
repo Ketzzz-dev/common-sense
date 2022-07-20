@@ -18,7 +18,8 @@ export class CommonSenseClient extends Client<true> {
         super({
             intents: [
                 GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers,
-                GatewayIntentBits.GuildWebhooks, GatewayIntentBits.MessageContent
+                GatewayIntentBits.GuildWebhooks, GatewayIntentBits.GuildPresences,
+                GatewayIntentBits.MessageContent
             ],
             allowedMentions: { repliedUser: false },
             partials: [Partials.Message],
