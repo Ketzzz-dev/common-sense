@@ -2,7 +2,6 @@ import { Command } from '../../Structures/Command'
 import { MODERATOR } from '../../Util/Permissions'
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import ms from 'ms'
-import GuildEvents from '../../Util/GuildEvents'
 
 export default new Command({
     name: 'timeout', category: 'moderation',
@@ -65,6 +64,4 @@ export default new Command({
                 .setFooter({ text: `Moderator: ${user.tag}` })
         ]
     })
-
-    GuildEvents.emit('modTimeout', guild, member, target, timeoutLength, reason)
 })

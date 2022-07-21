@@ -1,8 +1,7 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import ms from 'ms'
 import { Command } from '../../Structures/Command'
-import GuildEvents from '../../Util/GuildEvents'
-import { MODERATOR } from '../../Util/Permissions'
+import { MODERATOR, ADMINISTRATOR } from '../../Util/Permissions'
 import { setLongTimeout } from '../../Util/Timers'
 
 export default new Command({
@@ -49,12 +48,14 @@ export default new Command({
         return await interaction.reply({ content: 'Option `time` is invalid.', ephemeral: true })
     }
 
+    let staffLevel = member.permissions.has(ADMINISTRATOR) ? 'Administrator' : 'Moderator'
+
     await target.send({
         embeds: [
             new EmbedBuilder()
                 .setTitle(`You were banned from **${guild.name}**!`).setColor('DarkButNotBlack')
                 .setDescription(`**Reason**: ${reason}`)
-                .setFooter({ text: `Moderator: ${user.tag}` })
+                .setFooter({ text: `${staffLevel}: ${user.tag}` })
         ]
     })
 
@@ -65,12 +66,10 @@ export default new Command({
             new EmbedBuilder()
                 .setTitle(`**${banned.user.tag}** was banned!`).setColor('Blue')
                 .setDescription(`**Reason**: ${reason}`)
-                .setFooter({ text: `Moderator: ${user.tag}` })
+                .setFooter({ text: `${staffLevel}: ${user.tag}` })
         ]
     })
 
     if (banLength)
         setLongTimeout(() => guild.members.unban(banned.id), banLength)
-
-    GuildEvents.emit('modKick', guild, member, target, reason)
 })

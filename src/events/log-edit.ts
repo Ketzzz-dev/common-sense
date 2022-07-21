@@ -1,8 +1,7 @@
 import { ChannelType, EmbedBuilder } from 'discord.js'
 import { Event } from '../Structures/Event'
-import { getGuildSettings } from '../Util/DB'
 import { sendWebhook } from '../Util/Webhooks'
-
+import GuildSettingsModel from '../Models/GuildSettingsModel'
 
 export default new Event('messageUpdate', async (client, oldMessage, newMessage) => {
     let { user } = client
@@ -10,8 +9,12 @@ export default new Event('messageUpdate', async (client, oldMessage, newMessage)
     if (!oldMessage.inGuild() || !newMessage.inGuild() || !newMessage.content)
         return
     
-    let settings = await getGuildSettings(oldMessage.guildId)
-    let activityLogs = oldMessage.guild.channels.cache.get(settings.channels.activity_logs)
+    let settings = await GuildSettingsModel.get(oldMessage.guild.id)
+
+    if (!settings.channels.activityLogs)
+        return
+
+    let activityLogs = oldMessage.guild.channels.cache.get(settings.channels.activityLogs)
 
     if (activityLogs?.type != ChannelType.GuildText)
         return

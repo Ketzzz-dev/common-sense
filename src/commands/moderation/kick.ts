@@ -1,7 +1,6 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import { Command } from '../../Structures/Command'
-import GuildEvents from '../../Util/GuildEvents'
-import { MODERATOR } from '../../Util/Permissions'
+import { ADMINISTRATOR, MODERATOR } from '../../Util/Permissions'
 
 export default new Command({
     name: 'kick', category: 'moderation',
@@ -33,12 +32,14 @@ export default new Command({
     else if (target.permissions.has(MODERATOR))
         return await interaction.reply({ content: 'You cannot kick members with the same or higher permissions as you.', ephemeral: true })
 
+    let staffLevel = member.permissions.has(ADMINISTRATOR) ? 'Administrator' : 'Moderator'
+
     await target.send({
         embeds: [
             new EmbedBuilder()
                 .setTitle(`You were kicked from **${guild.name}**!`).setColor('DarkButNotBlack')
                 .setDescription(`**Reason**: ${reason}`)
-                .setFooter({ text: `Moderator: ${user.tag}` })
+                .setFooter({ text: `${staffLevel}: ${user.tag}` })
         ]
     })
     await target.kick(reason)
@@ -47,9 +48,7 @@ export default new Command({
             new EmbedBuilder()
                 .setTitle(`**${target.user.tag}** was kicked!`).setColor('Blue')
                 .setDescription(`**Reason**: ${reason}`)
-                .setFooter({ text: `Moderator: ${user.tag}` })
+                .setFooter({ text: `${staffLevel}: ${user.tag}` })
         ]
     })
-
-    GuildEvents.emit('modKick', guild, member, target, reason)
 })

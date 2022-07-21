@@ -14,7 +14,6 @@ export default new Command({
         embeds: [
             new EmbedBuilder()
                 .setTitle('Bot Status').setColor('Green')
-                .setThumbnail(client.user.displayAvatarURL({ extension: 'png', size: 1024 }))
                 .setDescription(`Serving **${users.cache.size.toLocaleString()}** users in **${guilds.cache.size.toLocaleString()}** different servers!`)
                 .addFields(
                     {

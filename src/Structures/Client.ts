@@ -1,11 +1,11 @@
 import { REST } from "@discordjs/rest"
-import { ActivityType, Client, Collection, GatewayIntentBits, IntentsBitField, Partials, Routes } from "discord.js"
+import { ActivityType, Client, Collection, GatewayIntentBits, Partials, Routes } from "discord.js"
 import { readdir } from "fs/promises"
 import { join } from "path"
-import { defaultImport } from "../Util/FS"
+import { connect } from 'mongoose'
 import { Command } from "./Command"
 import { Event } from "./Event"
-import { connect } from 'mongoose'
+import { defaultImport } from "../Util/FS"
 import Logger from '../Util/Logger'
 
 /**
@@ -89,9 +89,9 @@ export class CommonSenseClient extends Client<true> {
             await rest.put(route, { body: this.commands.map(command => command.toJSON()) })
 
             Logger.info('Commands registered!')
-        } catch (error) {
+        } catch (error: any) {
             Logger.error('Failed to register commands')
-            Logger.error(error)
+            console.error(error)
         }
     }
 

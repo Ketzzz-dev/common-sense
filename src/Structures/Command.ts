@@ -13,8 +13,8 @@ export interface ICommandConfig {
  * The command class.
  */
 export class Command {
-    private readonly options: APIApplicationCommandOption[]
-    private readonly permissions: `${bigint}`
+    private readonly options?: APIApplicationCommandOption[]
+    private readonly permissions?: bigint
 
     /**
      * The name of the command.
@@ -41,18 +41,30 @@ export class Command {
         this.category = config.category
         this.description = config.description
 
-        this.options = config.options ?? []
-        this.permissions = PermissionsBitField.resolve(config.permissions ?? PermissionsBitField.Default).toString() as `${bigint}`
+        this.options = config.options
+        this.permissions = config.permissions ? PermissionsBitField.resolve(config.permissions) : void 0
     }
 
     /**
      * Converts the command to JSON.
      */
     public toJSON(): RESTPostAPIApplicationCommandsJSONBody {
-        return {
+        let json: RESTPostAPIApplicationCommandsJSONBody = {
             name: this.name, description: this.description,
-            options: this.options, default_member_permissions: this.permissions,
             dm_permission: false
         }
+
+        if (this.options)
+            json.options = [...this.options]
+        if (this.permissions)
+            json.default_member_permissions = `${this.permissions}`
+
+        return json
+
+        // return {
+        //     name: this.name, description: this.description,
+        //     options: this.options, default_member_permissions: this.permissions,
+        //     dm_permission: false
+        // }
     }
 }

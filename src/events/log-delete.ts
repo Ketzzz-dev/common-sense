@@ -1,7 +1,7 @@
 import { AuditLogEvent, ChannelType, EmbedBuilder } from 'discord.js'
 import { Event } from '../Structures/Event'
-import { getGuildSettings } from '../Util/DB'
 import { sendWebhook } from '../Util/Webhooks'
+import GuildSettingsModel from '../Models/GuildSettingsModel'
 
 export default new Event('messageDelete', async (client, deletedMessage) => {
     let { user } = client
@@ -11,8 +11,12 @@ export default new Event('messageDelete', async (client, deletedMessage) => {
     
     let { guild, content, attachments, channel, author } = deletedMessage
     
-    let settings = await getGuildSettings(guild.id)
-    let activityLogs = guild.channels.cache.get(settings.channels.activity_logs)
+    let settings = await GuildSettingsModel.get(guild.id)
+
+    if (!settings.channels.activityLogs)
+        return
+
+    let activityLogs = guild.channels.cache.get(settings.channels.activityLogs)
 
     if (activityLogs?.type != ChannelType.GuildText)
         return
