@@ -1,5 +1,5 @@
 import { Command } from '../../Structures/Command'
-import { MODERATOR } from '../../Util/Permissions'
+import { MODERATOR } from '../../Util/Common'
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import ms from 'ms'
 

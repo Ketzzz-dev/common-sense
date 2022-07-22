@@ -1,6 +1,6 @@
 import { ChannelType, EmbedBuilder } from 'discord.js'
 import { Event } from '../Structures/Event'
-import { sendWebhook } from '../Util/Webhooks'
+import { sendWebhook } from '../Util/Common'
 import GuildSettingsModel from '../Models/GuildSettingsModel'
 
 export default new Event('messageUpdate', async (client, oldMessage, newMessage) => {

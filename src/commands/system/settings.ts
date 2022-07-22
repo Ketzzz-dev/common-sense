@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ChannelType, EmbedBuilder, PermissionFlagsBits } from 'discord.js'
 import GuildSettingsModel, { GuildChannelSettings, GuildRoleSettings } from '../../Models/GuildSettingsModel'
 import { Command } from '../../Structures/Command'
-import { ADMINISTRATOR, MODERATOR } from '../../Util/Permissions'
+import { ADMINISTRATOR, MODERATOR } from '../../Util/Common'
 
 const CHANNEL_MAP: Record<number, keyof GuildChannelSettings> = {
     0: 'activityLogs',

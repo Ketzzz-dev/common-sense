@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import { Command } from '../../Structures/Command'
-import { MODERATOR } from '../../Util/Permissions'
+import { MODERATOR } from '../../Util/Common'
 
 export default new Command({
     name: 'purge', category: 'moderation',

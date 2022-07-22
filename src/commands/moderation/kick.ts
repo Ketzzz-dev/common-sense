@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import { Command } from '../../Structures/Command'
-import { ADMINISTRATOR, MODERATOR } from '../../Util/Permissions'
+import { ADMINISTRATOR, MODERATOR } from '../../Util/Common'
 
 export default new Command({
     name: 'kick', category: 'moderation',

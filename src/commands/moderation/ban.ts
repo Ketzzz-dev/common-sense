@@ -1,8 +1,7 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import ms from 'ms'
 import { Command } from '../../Structures/Command'
-import { MODERATOR, ADMINISTRATOR } from '../../Util/Permissions'
-import { setLongTimeout } from '../../Util/Timers'
+import { MODERATOR, ADMINISTRATOR, setLongTimeout } from '../../Util/Common'
 
 export default new Command({
     name: 'ban', category: 'moderation',

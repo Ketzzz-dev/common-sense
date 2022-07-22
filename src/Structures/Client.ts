@@ -5,7 +5,7 @@ import { join } from "path"
 import { connect } from 'mongoose'
 import { Command } from "./Command"
 import { Event } from "./Event"
-import { defaultImport } from "../Util/FS"
+import { defaultImport } from "../Util/Common"
 import Logger from '../Util/Logger'
 
 /**

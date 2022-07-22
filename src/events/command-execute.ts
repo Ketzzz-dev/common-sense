@@ -1,7 +1,7 @@
 import { Formatters } from 'discord.js'
 import GuildSettingsModel from '../Models/GuildSettingsModel'
 import { Event } from "../Structures/Event"
-import { MODERATOR } from '../Util/Permissions'
+import { MODERATOR } from '../Util/Common'
 
 const COOLDOWNS = new Set<string>()
 
