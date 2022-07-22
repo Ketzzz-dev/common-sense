@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import { Command } from '../../Structures/Command'
 import { MODERATOR } from '../../Util/Common'
+import CustomEventHandler from '../../Util/CustomEventHandler'
 
 export default new Command({
     name: 'purge', category: 'moderation',
@@ -18,7 +19,7 @@ export default new Command({
         }
     ]
 }, async (client, interaction) => {
-    let { options, channel, user } = interaction
+    let { options, channel, user, guild } = interaction
 
     let amount = options.getInteger('amount', true)
     let target = options.getUser('target')
@@ -31,16 +32,16 @@ export default new Command({
         messages = messages.filter(message => message.author.id == id)
     }
 
-    let { size } = await channel!.bulkDelete(messages, true)
+    let deletedMessages = await channel!.bulkDelete(messages, true)
 
     await interaction.reply({
         embeds: [
             new EmbedBuilder()
                 .setTitle('Messages Purged!').setColor('Blue')
-                .setDescription(target ? `Purged ${size} messages from ${target.toString()}.` : `Purged ${size} from this channel.`)
+                .setDescription(target ? `Purged ${deletedMessages.size} messages from ${target.toString()}.` : `Purged ${deletedMessages.size} from this channel.`)
                 .setFooter({ text: `Moderator: ${user.tag}` })
         ]
     })
-    
-    setTimeout(async () => await interaction.deleteReply(), 3000)
+
+    CustomEventHandler.emit('purge', client.user, guild, user, channel!, deletedMessages)
 })

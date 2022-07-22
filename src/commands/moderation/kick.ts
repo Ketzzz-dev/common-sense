@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import { Command } from '../../Structures/Command'
 import { ADMINISTRATOR, MODERATOR } from '../../Util/Common'
+import CustomEventHandler from '../../Util/CustomEventHandler'
 
 export default new Command({
     name: 'kick', category: 'moderation',
@@ -51,4 +52,6 @@ export default new Command({
                 .setFooter({ text: `${staffLevel}: ${user.tag}` })
         ]
     })
+
+    CustomEventHandler.emit('kick', client.user, guild, user, target.user, reason)
 })

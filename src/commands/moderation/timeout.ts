@@ -2,6 +2,7 @@ import { Command } from '../../Structures/Command'
 import { MODERATOR } from '../../Util/Common'
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
 import ms from 'ms'
+import CustomEventHandler from '../../Util/CustomEventHandler'
 
 export default new Command({
     name: 'timeout', category: 'moderation',
@@ -47,10 +48,12 @@ export default new Command({
         return await interaction.reply({ content: 'Option `time` is invalid.', ephemeral: true })
     }
 
+    let longTimeout = ms(timeoutLength, { long: true })
+
     await target.send({
         embeds: [
             new EmbedBuilder()
-                .setTitle(`You were timed out from **${guild.name}** for **${ms(timeoutLength, { long: true })}**!`).setColor('DarkButNotBlack')
+                .setTitle(`You were timed out from **${guild.name}** for **${longTimeout}**!`).setColor('DarkButNotBlack')
                 .setDescription(`**Reason**: ${reason}`)
                 .setFooter({ text: `Moderator: ${user.tag}` })
         ]
@@ -59,9 +62,13 @@ export default new Command({
     await interaction.reply({
         embeds: [
             new EmbedBuilder()
-                .setTitle(`**${target.user.tag}** was timed out for **${ms(timeoutLength, { long: true })}**!`).setColor('Blue')
+                .setTitle(`**${target.user.tag}** was timed out for **${longTimeout}**!`).setColor('Blue')
                 .setDescription(`**Reason**: ${reason}`)
                 .setFooter({ text: `Moderator: ${user.tag}` })
         ]
     })
+
+    CustomEventHandler.emit('timeout', client.user, guild, user, target.user, longTimeout, reason)
+
+    console.log(true)
 })

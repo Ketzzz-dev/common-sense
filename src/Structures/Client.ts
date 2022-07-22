@@ -33,7 +33,7 @@ export class CommonSenseClient extends Client<true> {
     private async registerEvents(): Promise<void> {
         Logger.info('Registering events...')
 
-        let eventsPath = join(__dirname, '..', 'events')
+        let eventsPath = join(__dirname, '..', 'client_events')
         let eventFiles = (await readdir(eventsPath)).filter(file => file.endsWith('.js') || file.endsWith('.ts'))
         for (let file of eventFiles) {
             let filePath = join(eventsPath, file)
