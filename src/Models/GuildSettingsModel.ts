@@ -27,8 +27,8 @@ export class GuildSettings {
     @prop({ default: () => ({}), _id: false })
     public roles!: GuildRoleSettings
 
-    @prop({ default: () => ({}) })
-    public commands!: Record<string, boolean>
+    @prop({ type: Boolean, default: () => ({}) })
+    public commands!: Map<string, boolean>
 
     public static async initialise(this: ReturnModelType<typeof GuildSettings>, guildId: string): Promise<void> {
         let settingsDocument = await this.create({ guildId })
@@ -73,7 +73,7 @@ export class GuildSettings {
         if (!settingsDocument)
             return
 
-        settingsDocument.commands[commandName] = enabled
+        settingsDocument.commands.set(commandName, enabled)
 
         await settingsDocument.save()
     }

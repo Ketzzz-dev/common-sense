@@ -19,7 +19,7 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
     let isStaff = interaction.member.permissions.has(MODERATOR, true)
     let settings = await GuildSettingsModel.get(interaction.guildId)
 
-    if (settings.commands[command.name] === false)
+    if (settings.commands.get(interaction.commandName) === false)
         return await interaction.reply({ content: 'This command is disabled in this server.', ephemeral: true })
     if (settings.channels.botSpam && interaction.channelId != settings.channels.botSpam && !isStaff)
         return await interaction.reply({ content: `This command can only be executed in ${Formatters.channelMention(settings.channels.botSpam)}.`, ephemeral: true })
