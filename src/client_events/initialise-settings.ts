@@ -1,9 +1,8 @@
-import { Event } from '../Structures/Event'
+import ClientEvent from '../Structures/ClientEvent'
 import GuildSettingsModel from '../Models/GuildSettingsModel'
-import Logger from '../Util/Logger'
+import Logger from '../Structures/Logger'
 
-
-export default new Event('guildCreate', async (client, guild) => {
+export default new ClientEvent('guildCreate', async (client, guild) => {
     let { id, name } = guild
 
     await GuildSettingsModel.initialise(id)

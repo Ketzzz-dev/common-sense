@@ -1,9 +1,9 @@
 import { AuditLogEvent, ChannelType, EmbedBuilder } from 'discord.js'
-import { Event } from '../Structures/Event'
+import ClientEvent from '../Structures/ClientEvent'
 import { sendWebhook } from '../Util/Common'
 import GuildSettingsModel from '../Models/GuildSettingsModel'
 
-export default new Event('messageDelete', async (client, deletedMessage) => {
+export default new ClientEvent('messageDelete', async (client, deletedMessage) => {
     let { user } = client
     
     if (!deletedMessage.inGuild())

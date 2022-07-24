@@ -1,5 +1,5 @@
 import { PermissionsBitField, APIApplicationCommandOption, PermissionResolvable, RESTPostAPIApplicationCommandsJSONBody, ChatInputCommandInteraction } from "discord.js"
-import { CommonSenseClient } from "./Client"
+import CommonSenseClient from "./CommonSenseClient"
 
 /**
  * The configuration object to pass in the Command constructor.
@@ -41,8 +41,10 @@ export class Command {
         this.category = config.category
         this.description = config.description
 
-        this.options = config.options
-        this.permissions = config.permissions ? PermissionsBitField.resolve(config.permissions) : void 0
+        if (config.options)
+            this.options = config.options
+        if (config.permissions)
+            this.permissions = PermissionsBitField.resolve(config.permissions)
     }
 
     /**
@@ -60,11 +62,5 @@ export class Command {
             json.default_member_permissions = `${this.permissions}`
 
         return json
-
-        // return {
-        //     name: this.name, description: this.description,
-        //     options: this.options, default_member_permissions: this.permissions,
-        //     dm_permission: false
-        // }
     }
 }

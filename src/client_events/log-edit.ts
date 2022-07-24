@@ -1,9 +1,9 @@
 import { ChannelType, EmbedBuilder } from 'discord.js'
-import { Event } from '../Structures/Event'
+import ClientEvent from '../Structures/ClientEvent'
 import { sendWebhook } from '../Util/Common'
 import GuildSettingsModel from '../Models/GuildSettingsModel'
 
-export default new Event('messageUpdate', async (client, oldMessage, newMessage) => {
+export default new ClientEvent('messageUpdate', async (client, oldMessage, newMessage) => {
     let { user } = client
 
     if (!oldMessage.inGuild() || !newMessage.inGuild() || !newMessage.content)

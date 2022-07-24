@@ -2,7 +2,7 @@ import { Channel, ClientUser, Collection, Guild, Message, User } from 'discord.j
 import { EventEmitter } from 'eventemitter3'
 import { readdir } from 'fs/promises'
 import { join } from 'path'
-import { Event } from '../Structures/Event'
+import ClientEvent from '../Structures/ClientEvent'
 import { defaultImport } from './Common'
 
 export interface CustomEvents {
@@ -30,14 +30,12 @@ export default new class extends EventEmitter<CustomEvents> {
 
         for (let file of eventFiles) {
             let filePath = join(eventsPath, file)
-            let event = await defaultImport<Event<any>>(filePath)
+            let event = await defaultImport<ClientEvent<any>>(filePath)
 
             if (!(event instanceof CustomEvent))
                 continue
 
             this[event.once ? 'once' : 'on'](event.key, event.emit)
-
-            console.log(event.key)
         }
     }
 }

@@ -1,4 +1,9 @@
-import { ApplicationCommandOptionType, ChannelType, EmbedBuilder, PermissionFlagsBits } from 'discord.js'
+import {
+    ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle,
+    ChannelType, EmbedBuilder, PermissionFlagsBits, PermissionOverwriteOptions,
+    PermissionResolvable, SelectMenuBuilder, SelectMenuComponentOptionData, TextChannel,
+    ComponentType
+} from 'discord.js'
 import GuildSettingsModel, { GuildChannelSettings, GuildRoleSettings } from '../../Models/GuildSettingsModel'
 import { Command } from '../../Structures/Command'
 import { ADMINISTRATOR, MODERATOR } from '../../Util/Common'
@@ -8,18 +13,23 @@ const CHANNEL_MAP: Record<number, keyof GuildChannelSettings> = {
     1: 'moderationLogs',
     2: 'botSpam'
 }
+const CHANNEL_PERMISSIONS_MAP: Record<keyof GuildChannelSettings, PermissionOverwriteOptions> = {
+    'activityLogs': { SendMessages: false },
+    'moderationLogs': { SendMessages: false },
+    'botSpam': { UseApplicationCommands: true },
+}
 const ROLE_MAP: Record<number, keyof GuildRoleSettings> = {
     0: 'moderator',
     1: 'administrator'
 }
-const ROLE_PERMISSIONS_MAP: Record<keyof GuildRoleSettings, bigint> = {
+const ROLE_PERMISSIONS_MAP: Record<keyof GuildRoleSettings, PermissionResolvable> = {
     'moderator': MODERATOR,
     'administrator': ADMINISTRATOR
 }
 
 export default new Command({
     name: 'settings', category: 'system',
-    description: 'Server settings.',
+    description: 'Configuration for server settings.',
     permissions: ADMINISTRATOR,
     options: [
         {
@@ -43,6 +53,10 @@ export default new Command({
                                 { name: 'Moderation Logs', value: 1 },
                                 { name: 'Bot Spam', value: 2 }
                             ]
+                        },
+                        {
+                            type: ApplicationCommandOptionType.Boolean,
+                            name: 'set_permissions', description: 'Whether or not to set the necessary permissions for the channel. Ignores if left unspecified.'
                         }
                     ]
                 },
@@ -86,20 +100,34 @@ export default new Command({
                     ]
                 }
             ]
+        },
+        {
+            type: ApplicationCommandOptionType.Subcommand,
+            name: 'setup', description: 'Guides you through prompt through setting up the roles and channels for moderation.'
         }
     ]
 }, async (client, interaction) => {
     let { guild, user, options } = interaction
 
-    let group = options.getSubcommandGroup(true)
-    let subcommand = options.getSubcommand(true)
+    let group = options.getSubcommandGroup()
+    let subcommand = options.getSubcommand()
 
-    switch (`${group}:${subcommand}`) {
+    switch (`${group ?? 'N'}:${subcommand}`) {
         case 'set:channel': {
             let functionality = options.getInteger('functionality', true)
-            let channel = options.getChannel('channel', true)
+            let channel = options.getChannel('channel', true) as TextChannel
+            let setPerms = options.getBoolean('set_permissions')
 
             let key = CHANNEL_MAP[functionality]
+
+            if (setPerms) {
+                let me = await guild.members.fetchMe()
+
+                if (!me.permissions.has(PermissionFlagsBits.ManageChannels))
+                    return await interaction.reply({ content: 'I do not have permission to manage channels.', ephemeral: true })
+
+                await channel.permissionOverwrites.edit(guild.roles.everyone, CHANNEL_PERMISSIONS_MAP[key])
+            }
 
             await GuildSettingsModel.setChannelFunctionality(guild.id, key, channel.id)
 
@@ -145,7 +173,7 @@ export default new Command({
             let commandName = options.getString('command_name', true)
             let enabled = options.getBoolean('enabled', true)
 
-            if (!client.commands.has(commandName))
+            if (!client.commandHandler.commands.has(commandName))
                 return await interaction.reply({ content: `Unknown command: \`${commandName}\`.`, ephemeral: true })
 
             await GuildSettingsModel.setCommandEnabled(guild.id, commandName, enabled)
@@ -161,3 +189,7 @@ export default new Command({
         }
     }
 })
+
+async function executeChannel(): Promise<void> {
+
+}

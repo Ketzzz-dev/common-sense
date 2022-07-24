@@ -1,17 +1,17 @@
 import { Formatters } from 'discord.js'
 import GuildSettingsModel from '../Models/GuildSettingsModel'
-import { Event } from "../Structures/Event"
+import ClientEvent from "../Structures/ClientEvent"
 import { MODERATOR } from '../Util/Common'
 
 const COOLDOWNS = new Set<string>()
 
-export default new Event('interactionCreate', async (client, interaction) => {
+export default new ClientEvent('interactionCreate', async (client, interaction) => {
     if (!interaction.isChatInputCommand() || !interaction.inCachedGuild())
         return
     if (COOLDOWNS.has(interaction.member.id))
         return await interaction.reply({ content: 'Slow down there, buddy!', ephemeral: true })
 
-    let command = client.commands.get(interaction.commandName)
+    let command = client.commandHandler.commands.get(interaction.commandName)
 
     if (!command)
         return await interaction.reply({ content: `Unknown command: \`${interaction.commandName}\`.`, ephemeral: true })
