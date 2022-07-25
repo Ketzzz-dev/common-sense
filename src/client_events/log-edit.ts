@@ -1,7 +1,8 @@
-import { ChannelType, EmbedBuilder } from 'discord.js'
+import { ChannelType } from 'discord.js'
 import ClientEvent from '../Structures/ClientEvent'
 import { sendWebhook } from '../Util/Common'
 import GuildSettingsModel from '../Models/GuildSettingsModel'
+import { createLogEmbed } from '../Util/Embeds'
 
 export default new ClientEvent('messageUpdate', async (client, oldMessage, newMessage) => {
     let { user } = client
@@ -27,16 +28,13 @@ export default new ClientEvent('messageUpdate', async (client, oldMessage, newMe
 
     await sendWebhook(user, activityLogs, {
         embeds: [
-            new EmbedBuilder()
-                .setTitle('Message Edited!').setColor('Blurple')
-                .setDescription(`${oldMessage.author} edited their message in ${oldMessage.channel}`)
-                .addFields(
-                    { name: 'Old Content', value: oldContent },
-                    { name: 'Old Attachments', value: oldAttachments },
-                    { name: 'New Content', value: newContent },
-                    { name: 'New Attachments', value: newAttachments }
-                )
-                .setTimestamp()
+            createLogEmbed(
+                'Message edited', `${oldMessage.author} edited their message in ${oldMessage.channel}`,
+                { name: 'Old content', value: oldContent },
+                { name: 'Old attachments', value: oldAttachments },
+                { name: 'New content', value: newContent },
+                { name: 'New attachments', value: newAttachments }
+            )
         ]
     })
 })

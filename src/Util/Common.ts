@@ -1,9 +1,5 @@
 import { ClientUser, MessagePayload, PermissionFlagsBits, PermissionsBitField, TextChannel, WebhookMessageOptions } from 'discord.js'
-/**
- * A simple method to easily import files that have a default export.
- * 
- * @param path - The path to the file.
- */
+
 export const MODERATOR = PermissionsBitField.resolve([
     PermissionFlagsBits.BanMembers, PermissionFlagsBits.ChangeNickname,
     PermissionFlagsBits.DeafenMembers, PermissionFlagsBits.KickMembers,
@@ -46,4 +42,11 @@ export function setLongTimeout<T extends any[]>(callback: (...args: T) => void, 
             callback(...args)
         }
     })
+}
+export function getTime(): string {
+    let date = new Date
+
+    return [date.getHours(), date.getMinutes(), date.getSeconds()]
+        .map(n => n.toString().padStart(2, '0'))
+        .join(':')
 }

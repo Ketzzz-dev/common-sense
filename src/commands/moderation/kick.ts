@@ -1,55 +1,54 @@
-import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
-import { Command } from '../../Structures/Command'
-import { ADMINISTRATOR, MODERATOR } from '../../Util/Common'
+import { Formatters } from 'discord.js'
+import Command from '../../Structures/Command'
+import { MODERATOR } from '../../Util/Common'
+import { createWarnEmbed, createDefaultEmbed } from '../../Util/Embeds'
 import CustomEventHandler from '../../Util/CustomEventHandler'
+import { UserOption, StringOption } from '../../Structures/CommandOptions'
 
 export default new Command({
     name: 'kick', category: 'moderation',
     description: 'Kicks `target` from the server.',
     permissions: MODERATOR,
     options: [
-        {
-            type: ApplicationCommandOptionType.User,
-            name: 'target', description: 'The target user to kick.',
-            required: true
-        },
-        {
-            type: ApplicationCommandOptionType.String,
-            name: 'reason', description: 'The reason this user was kicked.'
-        }
+        new UserOption('target', 'The target user to kick.', true),
+        new StringOption('reason', 'The reason this user was kicked.')
     ]
 }, async (client, interaction) => {
-    let { options, guild, user, member } = interaction
+    let { options, guild, user } = interaction
 
     let target = options.getMember('target')
     let reason = options.getString('reason') ?? 'No reason provided.'
 
     if (!target)
-        return await interaction.reply({ content: 'Unknown user.', ephemeral: true })
+        return await interaction.reply({
+            embeds: [createWarnEmbed('Unknown user.')],
+            ephemeral: true
+        })
     else if (target.id == user.id)
-        return await interaction.reply({ content: 'You cannot kick yourself, silly.', ephemeral: true })
+        return await interaction.reply({
+            embeds: [createWarnEmbed('You cannot kick yourself, silly.')],
+            ephemeral: true
+        })
     else if (target.id == client.user.id)
-        return await interaction.reply({ content: 'You cannot kick me, silly.', ephemeral: true })
+        return await interaction.reply({
+            embeds: [createWarnEmbed('You cannot kick me, silly.')],
+            ephemeral: true
+        })
     else if (target.permissions.has(MODERATOR))
-        return await interaction.reply({ content: 'You cannot kick members with the same or higher permissions as you.', ephemeral: true })
-
-    let staffLevel = member.permissions.has(ADMINISTRATOR) ? 'Administrator' : 'Moderator'
+        return await interaction.reply({
+            embeds: [createWarnEmbed('You cannot kick members with the same or higher permissions as you.')],      
+            ephemeral: true
+        })
 
     await target.send({
-        embeds: [
-            new EmbedBuilder()
-                .setTitle(`You were kicked from **${guild.name}**!`).setColor('DarkButNotBlack')
-                .setDescription(`**Reason**: ${reason}`)
-                .setFooter({ text: `${staffLevel}: ${user.tag}` })
-        ]
+        embeds: [createDefaultEmbed(`You were kicked from ${guild.name}`, Formatters.codeBlock(reason), user)]
     })
-    await target.kick(reason)
+
+    let kicked = await target.kick(reason)
+
     await interaction.reply({
         embeds: [
-            new EmbedBuilder()
-                .setTitle(`**${target.user.tag}** was kicked!`).setColor('Blue')
-                .setDescription(`**Reason**: ${reason}`)
-                .setFooter({ text: `${staffLevel}: ${user.tag}` })
+            createDefaultEmbed(`${kicked.user.tag} was kicked`, Formatters.codeBlock(reason), user)
         ]
     })
 

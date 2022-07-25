@@ -2,6 +2,7 @@ import { AuditLogEvent, ChannelType, EmbedBuilder } from 'discord.js'
 import ClientEvent from '../Structures/ClientEvent'
 import { sendWebhook } from '../Util/Common'
 import GuildSettingsModel from '../Models/GuildSettingsModel'
+import { createLogEmbed } from '../Util/Embeds'
 
 export default new ClientEvent('messageDelete', async (client, deletedMessage) => {
     let { user } = client
@@ -28,17 +29,13 @@ export default new ClientEvent('messageDelete', async (client, deletedMessage) =
     let deletedContent = content.length > 1024 ? content.slice(0, 1021) + '...' : content || 'None'
     let deletedAttachments = attachments.size ? attachments.map(att => att.proxyURL).join('\n') : 'None'
 
-
     await sendWebhook(user, activityLogs, {
         embeds: [
-            new EmbedBuilder()
-                .setTitle('Message Deleted!').setColor('Blurple')
-                .setDescription(`${perpetrator} deleted a message in ${channel}`)
-                .addFields(
-                    { name: 'Deleted Content', value: deletedContent },
-                    { name: 'Deleted Attachments', value: deletedAttachments }
-                )
-                .setTimestamp()
+            createLogEmbed(
+                'Message deleted', `${perpetrator} deleted a message in ${channel}`,
+                { name: 'Deleted content', value: deletedContent },
+                { name: 'Deleted attachments', value: deletedAttachments }
+            )
         ]
     })
 })

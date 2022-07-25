@@ -1,66 +1,54 @@
-import { PermissionsBitField, APIApplicationCommandOption, PermissionResolvable, RESTPostAPIApplicationCommandsJSONBody, ChatInputCommandInteraction } from "discord.js"
-import CommonSenseClient from "./CommonSenseClient"
+import { ChatInputCommandInteraction, PermissionsBitField, RESTPostAPIApplicationCommandsJSONBody, SlashCommandBuilder } from 'discord.js'
+import { CommandOption } from './CommandOptions'
+import CommonSenseClient from './CommonSenseClient'
 
-/**
- * The configuration object to pass in the Command constructor.
- */
+export type CommandExecute = (client: CommonSenseClient, interaction: ChatInputCommandInteraction<'cached'>) => Promise<any>
+
 export interface ICommandConfig {
-    name: string; category: string; description: string
-    options?: APIApplicationCommandOption[]; permissions?: PermissionResolvable
+    name: string
+    category: string
+    description: string
+    permissions?: bigint
+    options?: CommandOption[]
 }
 
-/**
- * The command class.
- */
-export class Command {
-    private readonly options?: APIApplicationCommandOption[]
-    private readonly permissions?: bigint
+export default class Command {
+    private permissions?: bigint
+    private options?: CommandOption[]
 
-    /**
-     * The name of the command.
-     */
     public readonly name: string
-    /**
-     * The category of the command.
-     */
     public readonly category: string
-    /**
-     * The command's description.
-     */
     public readonly description: string
 
-    /**
-     * @param config - The configuration object.
-     * @param execute - The command's execute function.
-     */
-    public constructor(
+    public constructor (
         config: ICommandConfig,
-        public readonly execute: (client: CommonSenseClient, interaction: ChatInputCommandInteraction<'cached'>) => Promise<any>
+        public readonly execute: CommandExecute
     ) {
-        this.name = config.name
-        this.category = config.category
-        this.description = config.description
+        let { name, category, description, permissions, options } = config
 
-        if (config.options)
-            this.options = config.options
-        if (config.permissions)
-            this.permissions = PermissionsBitField.resolve(config.permissions)
+        this.name = name
+        this.category = category
+        this.description = description
+
+        if (permissions)
+            this.permissions = PermissionsBitField.resolve(permissions)
+        if (options)
+            this.options = options
     }
 
-    /**
-     * Converts the command to JSON.
-     */
     public toJSON(): RESTPostAPIApplicationCommandsJSONBody {
         let json: RESTPostAPIApplicationCommandsJSONBody = {
             name: this.name, description: this.description,
-            dm_permission: false
+            dm_permission: false,
         }
 
-        if (this.options)
-            json.options = [...this.options]
         if (this.permissions)
             json.default_member_permissions = `${this.permissions}`
+        if (this.options)
+            json.options = this.options.map(o => o.toJSON())
 
         return json
     }
 }
+
+SlashCommandBuilder

@@ -3,7 +3,7 @@ import { Collection, Routes } from 'discord.js'
 import { readdir } from 'fs/promises'
 import { join } from 'path'
 import { defaultImport } from '../Util/Common'
-import { Command } from './Command'
+import Command from './Command'
 import Logger from './Logger'
 
 export default class CommandHandler {
@@ -33,6 +33,8 @@ export default class CommandHandler {
                 this.commands.set(command.name, command)
 
                 Logger.info('%s: %s - registered!', command.category, command.name)
+
+                Logger.info('', command.toJSON().options)
             }
         }
 
@@ -44,7 +46,7 @@ export default class CommandHandler {
 
             Logger.info('Commands registered successfully!')
         } catch (error) {
-            Logger.error('Failed to register commands: ', error)
+            Logger.error('Failed to register commands:', error)
         }
     }
 }

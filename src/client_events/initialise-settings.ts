@@ -7,5 +7,5 @@ export default new ClientEvent('guildCreate', async (client, guild) => {
 
     await GuildSettingsModel.initialise(id)
 
-    Logger.info(`Initialised settings for ${name} (${id})`) 
+    Logger.info('Initialised settings for %s (%s)', name, id) 
 })

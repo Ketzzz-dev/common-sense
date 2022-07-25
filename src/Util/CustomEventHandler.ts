@@ -22,7 +22,7 @@ export class CustomEvent<K extends keyof CustomEvents> {
     ) { this.once = once ?? false }
 }
 
-export default new class extends EventEmitter<CustomEvents> {
+export default new class CustomEventHandler extends EventEmitter<CustomEvents> {
 
     public async initialise(): Promise<void> {
         let eventsPath = join(__dirname, '..', 'custom_events')
