@@ -25,7 +25,7 @@ export default class CommandHandler {
                 let command = await defaultImport<Command>(filePath)
 
                 if (!(command instanceof Command)) {
-                    Logger.warn('File %s does not export a command!', file)
+                    Logger.warn('File %s does not export a command - skipped!', file)
 
                     continue
                 }
@@ -33,8 +33,6 @@ export default class CommandHandler {
                 this.commands.set(command.name, command)
 
                 Logger.info('%s: %s - registered!', command.category, command.name)
-
-                Logger.info('', command.toJSON().options)
             }
         }
 

@@ -1,4 +1,3 @@
-import { Formatters } from 'discord.js'
 import ms from 'ms'
 import Command from '../../Structures/Command'
 import { StringOption, UserOption } from '../../Structures/CommandOptions'
@@ -54,13 +53,13 @@ export default new Command({
     let longBan = typeof banLength == 'string' ? 'permanently' : `for **${ms(banLength, { long: true })}**`
 
     await target.send({
-        embeds: [createDefaultEmbed(`You were banned from ${guild.name} ${longBan}`, Formatters.codeBlock(reason), user)]
+        embeds: [createDefaultEmbed(`You were banned from ${guild.name} ${longBan}`, `Reason: ${reason}`, user)]
     })
 
     let banned = await target.ban({ deleteMessageDays: 7, reason })
 
     await interaction.reply({
-        embeds: [createDefaultEmbed(`${banned.user.tag} was banned ${longBan}!`, Formatters.codeBlock(reason), user)]
+        embeds: [createDefaultEmbed(`${banned.user.tag} was banned ${longBan}!`, `Reason: ${reason}`, user)]
     })
 
     if (typeof banLength == 'number')

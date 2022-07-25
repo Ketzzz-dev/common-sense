@@ -1,4 +1,3 @@
-import { Formatters } from 'discord.js'
 import Command from '../../Structures/Command'
 import { MODERATOR } from '../../Util/Common'
 import { createWarnEmbed, createDefaultEmbed } from '../../Util/Embeds'
@@ -41,14 +40,14 @@ export default new Command({
         })
 
     await target.send({
-        embeds: [createDefaultEmbed(`You were kicked from ${guild.name}`, Formatters.codeBlock(reason), user)]
+        embeds: [createDefaultEmbed(`You were kicked from ${guild.name}`, `Reason: ${reason}`, user)]
     })
 
     let kicked = await target.kick(reason)
 
     await interaction.reply({
         embeds: [
-            createDefaultEmbed(`${kicked.user.tag} was kicked`, Formatters.codeBlock(reason), user)
+            createDefaultEmbed(`${kicked.user.tag} was kicked`, `Reason: ${reason}`, user)
         ]
     })
 

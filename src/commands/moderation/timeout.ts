@@ -1,6 +1,5 @@
 import Command from '../../Structures/Command'
 import { MODERATOR } from '../../Util/Common'
-import { Formatters } from 'discord.js'
 import ms from 'ms'
 import { createWarnEmbed, createDefaultEmbed } from '../../Util/Embeds'
 import CustomEventHandler from '../../Util/CustomEventHandler'
@@ -54,13 +53,13 @@ export default new Command({
     let longTimeout = ms(timeoutLength, { long: true })
 
     await target.send({
-        embeds: [createDefaultEmbed(`You were timed out from ${guild.name} for ${longTimeout}`, Formatters.codeBlock(reason), user)]
+        embeds: [createDefaultEmbed(`You were timed out from ${guild.name} for ${longTimeout}`, `Reason: ${reason}`, user)]
     })
 
     let timedOut = await target.timeout(timeoutLength, reason)
 
     await interaction.reply({
-        embeds: [createDefaultEmbed(`${timedOut.user.tag} was timed out for ${longTimeout}!`, Formatters.codeBlock(reason), user)]
+        embeds: [createDefaultEmbed(`${timedOut.user.tag} was timed out for ${longTimeout}!`, `Reason: ${reason}`, user)]
     })
 
     CustomEventHandler.emit('timeout', client.user, guild, user, target.user, longTimeout, reason)
