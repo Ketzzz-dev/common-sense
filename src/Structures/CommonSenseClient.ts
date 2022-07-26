@@ -1,12 +1,12 @@
 import { ActivityType, Client, GatewayIntentBits, Partials } from "discord.js"
 import { connect } from 'mongoose'
-import Logger from './Logger'
+import Logger from '../Util/Logger'
 import ClientEventHandler from './ClientEventHandler'
-import CommandHandler from './CommandHandler'
+import SlashCommandHandler from './SlashCommandHandler'
 
 export default class CommonSenseClient extends Client<true> {
     public readonly eventHandler = new ClientEventHandler(this)
-    public readonly commandHandler = new CommandHandler()
+    public readonly commandHandler = new SlashCommandHandler()
 
     public constructor() {
         super({

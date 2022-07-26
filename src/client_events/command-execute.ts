@@ -1,9 +1,8 @@
 import { Colors, EmbedBuilder, Formatters } from 'discord.js'
-import GuildSettingsModel from '../Models/GuildSettingsModel'
 import ClientEvent from "../Structures/ClientEvent"
-import Logger from '../Structures/Logger'
+import Logger from '../Util/Logger'
 import { MODERATOR } from '../Util/Common'
-import { createWarnEmbed } from '../Util/Embeds'
+import Embed from '../Util/Embed'
 
 const COOLDOWNS = new Set<string>()
 
@@ -15,7 +14,7 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
 
     if (COOLDOWNS.has(member.id))
         return await interaction.reply({
-            embeds: [createWarnEmbed('Slow down there, buddy.')],
+            embeds: [Embed.warning('Slow down there, buddy.')],
             ephemeral: true
         })
 
@@ -23,23 +22,11 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
 
     if (!command)
         return await interaction.reply({
-            embeds: [createWarnEmbed(`Unknown command: \`${commandName}\`.`)],
+            embeds: [Embed.warning(`Unknown command: \`${commandName}\`.`)],
             ephemeral: true
     })
     
     let isStaff = member.permissions.has(MODERATOR, true)
-    let settings = await GuildSettingsModel.get(guildId)
-
-    if (settings.commands.get(commandName) === false)
-        return await interaction.reply({
-            embeds: [createWarnEmbed('This command is disabled in this server.')],
-            ephemeral: true 
-        })
-    if (settings.channels.botSpam && channelId != settings.channels.botSpam && !isStaff)
-        return await interaction.reply({
-            embeds: [createWarnEmbed(`This command can only be executed in ${Formatters.channelMention(settings.channels.botSpam)}.`)],
-            ephemeral: true
-        })
 
     try {
         await command.execute(client, interaction)
@@ -61,6 +48,6 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
 
         COOLDOWNS.add(member.id)
 
-        setTimeout(() => COOLDOWNS.delete(member.id), parseInt(process.env.COMMAND_COOLDOWN!) * 1000)
+        setTimeout(() => COOLDOWNS.delete(member.id), 3000)
     }
 })

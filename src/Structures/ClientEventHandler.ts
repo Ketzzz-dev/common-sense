@@ -3,7 +3,7 @@ import { join } from 'path'
 import { defaultImport } from '../Util/Common'
 import CommonSenseClient from './CommonSenseClient'
 import ClientEvent from './ClientEvent'
-import Logger from './Logger'
+import Logger from '../Util/Logger'
 
 export default class ClientEventHandler {
     public constructor (private client: CommonSenseClient) {}
@@ -21,7 +21,7 @@ export default class ClientEventHandler {
             let event = await defaultImport<ClientEvent<any>>(filePath)
 
             if (!(event instanceof ClientEvent)) {
-                Logger.warn('File %s does not export an event!', file)
+                Logger.warn('File %s does not export an event - skipped!', file)
 
                 continue
             }

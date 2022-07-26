@@ -1,66 +1,51 @@
-import Command from '../../Structures/Command'
-import { MODERATOR } from '../../Util/Common'
 import ms from 'ms'
-import { createWarnEmbed, createDefaultEmbed } from '../../Util/Embeds'
-import CustomEventHandler from '../../Util/CustomEventHandler'
-import { UserOption, StringOption } from '../../Structures/CommandOptions'
+import SlashCommand from '../../Structures/SlashCommand'
+import { StringOption, UserOption } from '../../Structures/SlashCommandOptions'
+import { MODERATOR, MS_REGEXP } from '../../Util/Common'
+import Embed from '../../Util/Embed'
 
-export default new Command({
+export default new SlashCommand({
     name: 'timeout', category: 'moderation',
-    description: 'Times `target` out for `time`.',
+    description: 'Times {user} out for {length}.',
     permissions: MODERATOR,
     options: [
-        new UserOption('target', 'The target user to timeout.', true),
-        new StringOption('time', 'The length of the timeout.', true),
-        new StringOption('reason', 'The reason this user was timed out.')
+        new UserOption('target', 'The user to timeout.', { required: true }),
+        new StringOption('length', 'The length of the timeout. 30 minutes if left unspecified.'),
+        new StringOption('reason', 'The reason for this timeout.')  
     ]
 }, async (client, interaction) => {
-    let { options, guild, user } = interaction
+    let { options, member, guild } = interaction
 
     let target = options.getMember('target')
-    let time = options.getString('time', true)
-    let reason = options.getString('reason') ?? 'No reason provided.'
 
     if (!target)
-        return await interaction.reply({
-            embeds: [createWarnEmbed('Unknown user.')],
-            ephemeral: true
-        })
-    else if (target.id == user.id)
-        return await interaction.reply({
-            embeds: [createWarnEmbed('You cannot time yourself out, silly.')],
-            ephemeral: true
-        })
+        return await interaction.reply({ embeds: [Embed.warning('Unknown user.')], ephemeral: true })
+    else if (target.id == member.user.id)
+        return await interaction.reply({ embeds: [Embed.warning('You can\'t time yourself out, silly.')] })
     else if (target.id == client.user.id)
-        return await interaction.reply({
-            embeds: [createWarnEmbed('You cannot time me out, silly.')],
-            ephemeral: true
-        })
-    else if (target.permissions.has(MODERATOR))
-        return await interaction.reply({
-            embeds: [createWarnEmbed('You cannot time members out with the same or higher permissions as you.')],      
-            ephemeral: true
-        })
-    
-    let timeoutLength
-    
-    try {
-        timeoutLength = ms(time)
-    } catch (error) {
-        return await interaction.reply({ embeds: [createWarnEmbed('Option `time` is invalid.')], ephemeral: true })
-    }
+        return await interaction.reply({ embeds: [Embed.warning('You can\'t time me out, silly.')] })
+    else if (target.permissions.has(MODERATOR, true) && target.roles.highest.position >= member.roles.highest.position)
+        return await interaction.reply({ embeds: [Embed.warning('You can\'t time members out with the same or higher permissions as you.')] })
 
-    let longTimeout = ms(timeoutLength, { long: true })
+    let length = options.getString('length')
 
+    if (length && !length.match(MS_REGEXP))
+        return await interaction.reply({ embeds: [Embed.warning('Option `length` is invalid. Example: `30s`, `2h`, `1d`')] })
+
+    let time = length ? ms(length) : 30 * 60 * 1000
+
+    if (time < 0)
+        return await interaction.reply({ embeds: [Embed.warning('Option `length` must be a positive value.')] })
+
+    let reason = options.getString('reason') ?? 'No reason provided.'
+    
     await target.send({
-        embeds: [createDefaultEmbed(`You were timed out from ${guild.name} for ${longTimeout}`, `Reason: ${reason}`, user)]
+        embeds: [Embed.case(`You have been timed out from ${guild.name} for ${ms(time, { long: true })}`, reason)]
     })
 
-    let timedOut = await target.timeout(timeoutLength, reason)
+    let timedOut = await target.timeout(time, reason)
 
     await interaction.reply({
-        embeds: [createDefaultEmbed(`${timedOut.user.tag} was timed out for ${longTimeout}!`, `Reason: ${reason}`, user)]
+        embeds: [Embed.case(`${timedOut} has been timed out for ${ms(time, { long: true })}.`, reason)]
     })
-
-    CustomEventHandler.emit('timeout', client.user, guild, user, target.user, longTimeout, reason)
 })

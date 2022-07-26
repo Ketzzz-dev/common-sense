@@ -1,6 +1,6 @@
 import { cyan, yellow, red, gray } from 'colors/safe'
 import { format } from 'util'
-import { getTime } from '../Util/Common'
+import { getTime } from './Common'
 
 export default class Logger {
     private constructor() {}

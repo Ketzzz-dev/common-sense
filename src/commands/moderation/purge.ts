@@ -1,47 +1,35 @@
-// import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
-// import { Command } from '../../Structures/Command'
+// import { Collection, GuildTextBasedChannel, Message } from 'discord.js'
+// import Command from '../../Structures/Command'
+// import { IntegerOption, SubcommandOption } from '../../Structures/CommandOptions'
 // import { MODERATOR } from '../../Util/Common'
-// import CustomEventHandler from '../../Util/CustomEventHandler'
+
+// const AMOUNT_OPTION = new IntegerOption('amount', 'The amount of messages to purge.', { required: true, minValue: 1, maxValue: 1000 })
 
 // export default new Command({
 //     name: 'purge', category: 'moderation',
-//     description: 'Deletes `amount` messages from the channel or `target` if provided.',
+//     description: 'Deletes `amount` messages from the provided options.',
 //     permissions: MODERATOR,
 //     options: [
-//         {
-//             type: ApplicationCommandOptionType.Integer,
-//             name: 'amount', description: 'The amount of messages to delete.',
-//             required: true, min_value: 1
-//         },
-//         {
-//             type: ApplicationCommandOptionType.User,
-//             name: 'target', description: 'The target user to delete messages from.'
-//         }
+//         new SubcommandOption('normal', 'Purges messages from this channel', [AMOUNT_OPTION]),
+//         new SubcommandOption('bots', 'Purges messages sent by bots from this channel.', [AMOUNT_OPTION]),
+//         new SubcommandOption('humans', 'Purges messages sent by humans from this channel.', [AMOUNT_OPTION]),
+//         new SubcommandOption('user', 'Purges messages sent by `user` from this channel.', [AMOUNT_OPTION])
 //     ]
 // }, async (client, interaction) => {
-//     let { options, channel, user, guild } = interaction
+//     let { options, channel, user } = interaction
 
 //     let amount = options.getInteger('amount', true)
-//     let target = options.getUser('target')
 
 //     let messages = await channel!.messages.fetch({ limit: amount })
-    
-//     if (target) {
-//         let { id } = target
 
-//         messages = messages.filter(message => message.author.id == id)
+//     switch (options.getSubcommand()) {
+//         case 'normal': return await normal(channel!, messages)
 //     }
-
-//     let deletedMessages = await channel!.bulkDelete(messages, true)
-
-//     await interaction.reply({
-//         embeds: [
-//             new EmbedBuilder()
-//                 .setTitle('Messages Purged!').setColor('Blue')
-//                 .setDescription(target ? `Purged ${deletedMessages.size} messages from ${target.toString()}.` : `Purged ${deletedMessages.size} from this channel.`)
-//                 .setFooter({ text: `Moderator: ${user.tag}` })
-//         ]
-//     })
-
-//     CustomEventHandler.emit('purge', client.user, guild, user, channel!, deletedMessages)
 // })
+
+// async function normal(channel: GuildTextBasedChannel, messages: Collection<string, Message>): Promise<void> {
+//     let deletedMessages = await channel.bulkDelete(messages)
+// }
+// async function bots(messages: Collection<string, Message>): Promise<void> {
+
+// }

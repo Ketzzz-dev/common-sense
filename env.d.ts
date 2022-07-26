@@ -7,8 +7,6 @@ declare global {
             MODE: 'dev' | 'prod'
             GUILD_ID: string
             CLIENT_ID: string
-
-            COMMAND_COOLDOWN: string
         }
     }
 }

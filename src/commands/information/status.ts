@@ -1,8 +1,8 @@
 import { Formatters } from 'discord.js'
-import Command from '../../Structures/Command'
-import { createDefaultEmbed } from '../../Util/Embeds'
+import SlashCommand from '../../Structures/SlashCommand'
+import Embed from '../../Util/Embed'
 
-export default new Command({
+export default new SlashCommand({
     name: 'status', category: 'information',
     description: 'Provides an embed of the bot\'s current status.',
 }, async (client, interaction) => {
@@ -13,7 +13,7 @@ export default new Command({
 
     await interaction.editReply({
         embeds: [
-            createDefaultEmbed(
+            Embed.default(
                 'Bot status', 'Here is an embed of the bot\'s current status.', user,
                 {
                     name: 'Ping',

@@ -3,11 +3,11 @@ import { Collection, Routes } from 'discord.js'
 import { readdir } from 'fs/promises'
 import { join } from 'path'
 import { defaultImport } from '../Util/Common'
-import Command from './Command'
-import Logger from './Logger'
+import SlashCommand from './SlashCommand'
+import Logger from '../Util/Logger'
 
 export default class CommandHandler {
-    public readonly commands = new Collection<string, Command>()
+    public readonly commands = new Collection<string, SlashCommand>()
 
     public async registerCommands(commandsDirectory: string): Promise<void> {
         Logger.info('Registering commands')
@@ -22,9 +22,9 @@ export default class CommandHandler {
 
             for (let file of commandFiles) {
                 let filePath = join(commandCategoryPath, file)
-                let command = await defaultImport<Command>(filePath)
+                let command = await defaultImport<SlashCommand>(filePath)
 
-                if (!(command instanceof Command)) {
+                if (!(command instanceof SlashCommand)) {
                     Logger.warn('File %s does not export a command - skipped!', file)
 
                     continue
