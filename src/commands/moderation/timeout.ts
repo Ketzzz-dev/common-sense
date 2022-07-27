@@ -48,6 +48,6 @@ export default new SlashCommand({
     let timedOut = await target.timeout(time, reason)
 
     await interaction.reply({
-        embeds: [Embed.case(`${timedOut} has been timed out for ${ms(time, { long: true })}.`, reason)]
+        embeds: [Embed.case(`${timedOut.user.tag} has been timed out for ${ms(time, { long: true })}.`, reason)]
     })
 })

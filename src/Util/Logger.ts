@@ -5,6 +5,9 @@ import { getTime } from './Common'
 export default class Logger {
     private constructor() {}
 
+    public static clear(): void {
+        console.clear()
+    }
     public static info(message: string, ...args: any[]): void {
         console.info(`[${cyan('INFO')}] ${gray(getTime())} ${format(message, ...args)}`)
     }

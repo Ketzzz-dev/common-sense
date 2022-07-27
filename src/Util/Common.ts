@@ -51,10 +51,3 @@ export function getTime(): string {
         .map(n => n.toString().padStart(2, '0'))
         .join(':')
 }
-export function toTitleCase(str: string) {
-    return str.replace(
-        /\w\S*/g,
-        (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
-    )
-    
-}

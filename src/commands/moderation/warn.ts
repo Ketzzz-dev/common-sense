@@ -33,6 +33,6 @@ export default new SlashCommand({
     })
 
     await interaction.reply({
-        embeds: [Embed.case(`${target} has been kicked.`, reason)]
+        embeds: [Embed.case(`${target.user.tag} has been warned.`, reason)]
     })
 })

@@ -2,21 +2,12 @@ import { Colors, EmbedBuilder, Formatters } from 'discord.js'
 import ClientEvent from "../../Structures/ClientEvent"
 import Logger from '../../Util/Logger'
 import Embed from '../../Util/Embed'
-import { toTitleCase } from '../../Util/Common'
-
-// const COOLDOWNS = new Set<string>()
 
 export default new ClientEvent('interactionCreate', async (client, interaction) => {
     if (!interaction.isChatInputCommand() || !interaction.inCachedGuild())
         return
 
-    let { member, commandName, guild } = interaction
-
-    // if (COOLDOWNS.has(member.id))
-    //     return await interaction.reply({
-    //         embeds: [Embed.warning('Slow down there, buddy.')],
-    //         ephemeral: true
-    //     })
+    let { commandName, guild } = interaction
 
     let command = client.commandHandler.commands.get(commandName)
 
@@ -28,12 +19,13 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
 
     let { botPerms, name } = command
 
-    if (botPerms && !member.permissions.has(botPerms)) {
-        let me = await guild.members.fetchMe()
+    let me = await guild.members.fetchMe()
+
+    if (botPerms && !me.permissions.has(botPerms)) {
         let missing = me.permissions.missing(botPerms)
 
         return await interaction.reply({
-            embeds: [Embed.warning(`Missing permissions: ${missing.map(perm => `${toTitleCase(perm)}`).join(', ')}`)],
+            embeds: [Embed.warning(`Missing permissions: ${missing.map(perm => `\`${perm.replace(/\B([A-Z])/g, ' $1')}\``)}.`)],
             ephemeral: true
         })
     }
@@ -52,9 +44,5 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
         })
 
         Logger.error('Error while executing %s:', name, error)
-    } finally {
-        // COOLDOWNS.add(member.id)
-
-        // setTimeout(() => COOLDOWNS.delete(member.id), 3000)
     }
 })

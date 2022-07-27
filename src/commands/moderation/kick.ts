@@ -36,6 +36,6 @@ export default new SlashCommand({
     let kicked = await target.kick(reason)
 
     await interaction.reply({
-        embeds: [Embed.case(`${kicked} has been kicked.`, reason)]
+        embeds: [Embed.case(`${kicked.user.tag} has been kicked.`, reason)]
     })
 })
