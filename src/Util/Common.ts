@@ -8,7 +8,6 @@ export const MODERATOR = PermissionsBitField.resolve([
     PermissionFlagsBits.MuteMembers, PermissionFlagsBits.PrioritySpeaker,
     PermissionFlagsBits.ViewAuditLog, PermissionFlagsBits.UseApplicationCommands
 ])
-export const ADMINISTRATOR = PermissionsBitField.resolve(PermissionFlagsBits.Administrator)
 
 export const MAX_32_BIT_SIGNED = 2_147_483_647
 
@@ -51,4 +50,11 @@ export function getTime(): string {
     return [date.getHours(), date.getMinutes(), date.getSeconds()]
         .map(n => n.toString().padStart(2, '0'))
         .join(':')
+}
+export function toTitleCase(str: string) {
+    return str.replace(
+        /\w\S*/g,
+        (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
+    )
+    
 }

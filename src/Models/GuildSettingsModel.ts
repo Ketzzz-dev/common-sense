@@ -52,7 +52,11 @@
 
 //         await this.save()
 //     }
+//     public async setCooldown(this: DocumentType<GuildSettings>, cooldown: number): Promise<void> {
+//         this.cooldown = cooldown
+
+//         await this.save()
+//     }
 // }
 
 // export default getModelForClass(GuildSettings)
-// TODO: redo

@@ -5,13 +5,12 @@ import { MODERATOR } from '../../Util/Common'
 import Embed from '../../Util/Embed'
 
 export default new SlashCommand({
-    name: 'kick', category: 'moderation',
-    description: 'Kicks {target}.',
-    memberPerms: [PermissionFlagsBits.KickMembers],
-    botPerms: [PermissionFlagsBits.KickMembers],
+    name: 'warn', category: 'moderation',
+    description: 'Warns {target}.',
+    memberPerms: [PermissionFlagsBits.ModerateMembers],
     options: [
-        new UserOption('target', 'The user to kick.', { required: true }),
-        new StringOption('reason', 'The reason for this kick.') 
+        new UserOption('target', 'The user to warn.', { required: true }),
+        new StringOption('reason', 'The reason for this warn.') 
     ]
 }, async (client, interaction) => {
     let { options, member, guild } = interaction
@@ -21,21 +20,19 @@ export default new SlashCommand({
     if (!target)
         return await interaction.reply({ embeds: [Embed.warning('Unknown user.')], ephemeral: true })
     else if (target.id == member.user.id)
-        return await interaction.reply({ embeds: [Embed.warning('You can\'t kick yourself, silly.')] })
+        return await interaction.reply({ embeds: [Embed.warning('You can\'t warn yourself, silly.')] })
     else if (target.id == client.user.id)
-        return await interaction.reply({ embeds: [Embed.warning('You can\'t kick me, silly.')] })
+        return await interaction.reply({ embeds: [Embed.warning('You can\'t warn me, silly.')] })
     else if (target.permissions.has(MODERATOR) && target.roles.highest.position >= member.roles.highest.position)
-        return await interaction.reply({ embeds: [Embed.warning('You can\'t kick members with the same or higher permissions as you.')] })
+        return await interaction.reply({ embeds: [Embed.warning('You can\'t warn members with the same or higher permissions as you.')] })
 
     let reason = options.getString('reason') ?? 'No reason provided.'
     
     await target.send({
-        embeds: [Embed.case(`You have been kicked from ${guild.name}`, reason)]
+        embeds: [Embed.case(`You have been warned from ${guild.name}`, reason)]
     })
 
-    let kicked = await target.kick(reason)
-
     await interaction.reply({
-        embeds: [Embed.case(`${kicked} has been kicked.`, reason)]
+        embeds: [Embed.case(`${target} has been kicked.`, reason)]
     })
 })

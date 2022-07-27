@@ -1,3 +1,4 @@
+import { PermissionFlagsBits } from 'discord.js'
 import ms from 'ms'
 import SlashCommand from '../../Structures/SlashCommand'
 import { StringOption, UserOption } from '../../Structures/SlashCommandOptions'
@@ -7,7 +8,8 @@ import Embed from '../../Util/Embed'
 export default new SlashCommand({
     name: 'timeout', category: 'moderation',
     description: 'Times {user} out for {length}.',
-    permissions: MODERATOR,
+    memberPerms: [PermissionFlagsBits.ModerateMembers],
+    botPerms: [PermissionFlagsBits.ModerateMembers],
     options: [
         new UserOption('target', 'The user to timeout.', { required: true }),
         new StringOption('length', 'The length of the timeout. 30 minutes if left unspecified.'),
@@ -24,7 +26,7 @@ export default new SlashCommand({
         return await interaction.reply({ embeds: [Embed.warning('You can\'t time yourself out, silly.')] })
     else if (target.id == client.user.id)
         return await interaction.reply({ embeds: [Embed.warning('You can\'t time me out, silly.')] })
-    else if (target.permissions.has(MODERATOR, true) && target.roles.highest.position >= member.roles.highest.position)
+    else if (target.permissions.has(MODERATOR) && target.roles.highest.position >= member.roles.highest.position)
         return await interaction.reply({ embeds: [Embed.warning('You can\'t time members out with the same or higher permissions as you.')] })
 
     let length = options.getString('length')

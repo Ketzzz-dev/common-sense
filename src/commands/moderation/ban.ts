@@ -1,3 +1,4 @@
+import { PermissionFlagsBits } from 'discord.js'
 import ms from 'ms'
 import SlashCommand from '../../Structures/SlashCommand'
 import { StringOption, UserOption } from '../../Structures/SlashCommandOptions'
@@ -7,7 +8,8 @@ import Embed from '../../Util/Embed'
 export default new SlashCommand({
     name: 'ban', category: 'moderation',
     description: 'Bans {target} for {length} or permanently.',
-    permissions: MODERATOR,
+    memberPerms: [PermissionFlagsBits.BanMembers],
+    botPerms: [PermissionFlagsBits.BanMembers],
     options: [
         new UserOption('target', 'The user to timeout.', { required: true }),
         new StringOption('length', 'The length of the timeout. Permanently if left unspecified.'),
@@ -24,7 +26,7 @@ export default new SlashCommand({
         return await interaction.reply({ embeds: [Embed.warning('You can\'t time yourself out, silly.')] })
     else if (target.id == client.user.id)
         return await interaction.reply({ embeds: [Embed.warning('You can\'t time me out, silly.')] })
-    else if (target.permissions.has(MODERATOR, true) && target.roles.highest.position >= member.roles.highest.position)
+    else if (target.permissions.has(MODERATOR) && target.roles.highest.position >= member.roles.highest.position)
         return await interaction.reply({ embeds: [Embed.warning('You can\'t time members out with the same or higher permissions as you.')] })
 
     let length = options.getString('length')
@@ -39,7 +41,7 @@ export default new SlashCommand({
 
     let reason = options.getString('reason') ?? 'No reason provided.'
     
-    await interaction.reply({
+    await target.send({
         embeds: [Embed.case(`You have been banned from ${guild.name} ${time ? `for ${ms(time, { long: true })}` : 'permanently'}`, reason)]
     })
 

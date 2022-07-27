@@ -22,7 +22,7 @@ export default class CommonSenseClient extends Client<true> {
     }
 
     public async start(): Promise<void> {
-        await this.eventHandler.registerEvents('client_events')
+        await this.eventHandler.registerEvents('events/client')
         await this.commandHandler.registerCommands('commands')
 
         try {
