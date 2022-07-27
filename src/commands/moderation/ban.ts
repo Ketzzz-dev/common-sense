@@ -48,7 +48,7 @@ export default new SlashCommand({
     let banned = await target.ban({ deleteMessageDays: 7, reason })
 
     await interaction.reply({
-        embeds: [Embed.case(`${banned.user.tag} has been banned ${time ? `for ${ms(time, { long: true })}` : 'permanently'}.`, reason)]
+        embeds: [Embed.default(`Case #${null}: ban`, `${banned} has been banned ${time ? `for ${ms(time, { long: true })}` : 'permanently'}.`, member.user)]
     })
 
     if (time)
