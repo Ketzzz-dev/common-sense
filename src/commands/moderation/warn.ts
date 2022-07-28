@@ -1,4 +1,5 @@
 import { PermissionFlagsBits } from 'discord.js'
+import GuildCasesModel, { CaseType } from '../../Models/GuildCasesModel'
 import SlashCommand from '../../Structures/SlashCommand'
 import { StringOption, UserOption } from '../../Structures/SlashCommandOptions'
 import { MODERATOR } from '../../Util/Common'
@@ -32,7 +33,10 @@ export default new SlashCommand({
         embeds: [Embed.case(`You have been warned from ${guild.name}`, reason)]
     })
 
+    let guildCases = await GuildCasesModel.get(guild.id)
+    let caseId = await guildCases.addCase(CaseType.Warn, target.id, member.id, reason)
+
     await interaction.reply({
-        embeds: [Embed.default(`Case #${null}: warn`,`${target} has been warned.`, member.user)]
+        embeds: [Embed.default(`Case #${caseId}: warn`,`${target} has been warned.`, member.user)]
     })
 })

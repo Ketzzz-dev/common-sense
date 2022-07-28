@@ -1,5 +1,6 @@
 import { PermissionFlagsBits } from 'discord.js'
 import ms from 'ms'
+import GuildCasesModel, { CaseType } from '../../Models/GuildCasesModel'
 import SlashCommand from '../../Structures/SlashCommand'
 import { StringOption, UserOption } from '../../Structures/SlashCommandOptions'
 import { MODERATOR, MS_REGEXP, setLongTimeout } from '../../Util/Common'
@@ -8,8 +9,8 @@ import Embed from '../../Util/Embed'
 export default new SlashCommand({
     name: 'ban', category: 'moderation',
     description: 'Bans {target} for {length} or permanently.',
-    memberPerms: [PermissionFlagsBits.BanMembers],
-    botPerms: [PermissionFlagsBits.BanMembers],
+    memberPerms: PermissionFlagsBits.BanMembers,
+    botPerms: PermissionFlagsBits.BanMembers,
     options: [
         new UserOption('target', 'The user to timeout.', { required: true }),
         new StringOption('length', 'The length of the timeout. Permanently if left unspecified.'),
@@ -46,9 +47,11 @@ export default new SlashCommand({
     })
 
     let banned = await target.ban({ deleteMessageDays: 7, reason })
+    let guildCases = await GuildCasesModel.get(guild.id)
+    let caseId = await guildCases.addCase(CaseType.Ban, banned.id, member.id, reason)
 
     await interaction.reply({
-        embeds: [Embed.default(`Case #${null}: ban`, `${banned} has been banned ${time ? `for ${ms(time, { long: true })}` : 'permanently'}.`, member.user)]
+        embeds: [Embed.default(`Case #${caseId}: ban`, `${banned} has been banned ${time ? `for ${ms(time, { long: true })}` : 'permanently'}.`, member.user)]
     })
 
     if (time)

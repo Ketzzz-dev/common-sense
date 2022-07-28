@@ -1,5 +1,6 @@
 import { PermissionFlagsBits } from 'discord.js'
 import ms from 'ms'
+import GuildCasesModel, { CaseType } from '../../Models/GuildCasesModel'
 import SlashCommand from '../../Structures/SlashCommand'
 import { StringOption, UserOption } from '../../Structures/SlashCommandOptions'
 import { MODERATOR, MS_REGEXP } from '../../Util/Common'
@@ -46,8 +47,10 @@ export default new SlashCommand({
     })
 
     let timedOut = await target.timeout(time, reason)
+    let guildCases = await GuildCasesModel.get(guild.id)
+    let caseId = await guildCases.addCase(CaseType.Timeout, timedOut.id, member.id, reason)
 
     await interaction.reply({
-        embeds: [Embed.default(`Case #${null}: ban`, `${timedOut} has been timed out for ${ms(time, { long: true })}.`, member.user)]
+        embeds: [Embed.default(`Case #${caseId}: timeout`, `${timedOut} has been timed out for ${ms(time, { long: true })}.`, member.user)]
     })
 })

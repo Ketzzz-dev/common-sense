@@ -1,8 +1,3 @@
-// import { Collection, GuildTextBasedChannel, Message } from 'discord.js'
-// import Command from '../../Structures/Command'
-// import { IntegerOption, SubcommandOption } from '../../Structures/CommandOptions'
-// import { MODERATOR } from '../../Util/Common'
-
 import { Collection, Message, PermissionFlagsBits } from 'discord.js'
 import SlashCommand from '../../Structures/SlashCommand'
 import { IntegerOption, SubcommandOption, UserOption } from '../../Structures/SlashCommandOptions'
