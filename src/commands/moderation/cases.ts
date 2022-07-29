@@ -1,8 +1,11 @@
+import { DocumentType } from '@typegoose/typegoose'
 import { APIEmbedField, Formatters, PermissionFlagsBits } from 'discord.js'
-import GuildCasesModel from '../../Models/GuildCasesModel'
+import GuildCasesModel, { GuildCases } from '../../Models/GuildCasesModel'
 import SlashCommand from '../../Structures/SlashCommand'
 import { SubcommandOption, UserOption } from '../../Structures/SlashCommandOptions'
 import Embed from '../../Util/Embed'
+
+const CASES_CACHE = new Map<string, DocumentType<GuildCases>>()
 
 export default new SlashCommand({
     name: 'cases', category: 'moderation',
@@ -19,7 +22,10 @@ export default new SlashCommand({
 }, async (client, interaction) => {
     let { guild, options, member } = interaction
 
-    let guildCases = await GuildCasesModel.get(guild.id)
+    if (!CASES_CACHE.has(guild.id))
+        CASES_CACHE.set(guild.id, await GuildCasesModel.get(guild.id))
+
+    let guildCases = CASES_CACHE.get(guild.id)!
 
     switch (options.getSubcommand()) {
         case 'user': {

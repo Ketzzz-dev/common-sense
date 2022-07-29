@@ -1,4 +1,4 @@
-import { APIEmbed, APIEmbedField, Colors, User } from 'discord.js'
+import { APIEmbed, APIEmbedField, Colors, Formatters, User } from 'discord.js'
 
 export default class Embed {
     private constructor () {}
@@ -24,6 +24,14 @@ export default class Embed {
         return {
             color: Colors.DarkButNotBlack,
             title: message, description: `Reason: ${reason}`,
+            timestamp: new Date().toISOString()
+        }
+    }
+    public static error(commandName: string, error: any): APIEmbed {
+        return {
+            color: Colors.Red,
+            title: `Error while executing ${commandName}`,
+            description: Formatters.codeBlock(`${error}`),
             timestamp: new Date().toISOString()
         }
     }

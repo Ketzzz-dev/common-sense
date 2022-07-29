@@ -1,4 +1,4 @@
-import { Colors, EmbedBuilder, Formatters, TextChannel } from 'discord.js'
+import { Colors, Formatters, TextChannel } from 'discord.js'
 import ClientEvent from "../../Structures/ClientEvent"
 import Logger from '../../Util/Logger'
 import Embed from '../../Util/Embed'
@@ -35,13 +35,7 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
         await command.execute(client, interaction)
     } catch (error) {
         await sendWebhook(client.user, channel as TextChannel, {
-            embeds: [
-                new EmbedBuilder()
-                    .setTitle(`Error while executing ${name}`)
-                    .setColor(Colors.Red)
-                    .setDescription(Formatters.codeBlock('sh',`${error}`))
-                    .setTimestamp()
-            ]
+            embeds: [Embed.error(command.name, error)]
         })
 
         Logger.error('Error while executing %s:', name, error)
