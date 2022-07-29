@@ -1,13 +1,14 @@
-import { Colors, EmbedBuilder, Formatters } from 'discord.js'
+import { Colors, EmbedBuilder, Formatters, TextChannel } from 'discord.js'
 import ClientEvent from "../../Structures/ClientEvent"
 import Logger from '../../Util/Logger'
 import Embed from '../../Util/Embed'
+import { sendWebhook } from '../../Util/Common'
 
 export default new ClientEvent('interactionCreate', async (client, interaction) => {
     if (!interaction.isChatInputCommand() || !interaction.inCachedGuild())
         return
 
-    let { commandName, guild } = interaction
+    let { commandName, guild, channel } = interaction
 
     let command = client.commandHandler.commands.get(commandName)
 
@@ -33,7 +34,7 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
     try {
         await command.execute(client, interaction)
     } catch (error) {
-        await interaction.reply({
+        await sendWebhook(client.user, channel as TextChannel, {
             embeds: [
                 new EmbedBuilder()
                     .setTitle(`Error while executing ${name}`)

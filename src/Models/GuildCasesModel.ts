@@ -4,7 +4,9 @@ export enum CaseType {
     Warn = 'warn',
     Timeout = 'timeout',
     Kick = 'kick',
-    Ban = 'ban'
+    Ban = 'ban',
+    Unban = 'unban',
+    Untimeout = 'untimeout'
 }
 
 export class Case {

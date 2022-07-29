@@ -17,7 +17,12 @@ export default class CommonSenseClient extends Client<true> {
             ],
             allowedMentions: { repliedUser: false },
             partials: [Partials.Message],
-            presence: { activities: [{ name: 'Weezer', type: ActivityType.Listening }] }
+            presence: { 
+                activities: [{
+                    name: 'Weezer', type: ActivityType.Listening,
+                    url: 'https://open.spotify.com/track/7GptbanebPZYkLPvjNfd6m?si=29ca9eede0364af0'
+                }]
+            }
         })
     }
 
