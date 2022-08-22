@@ -1,7 +1,7 @@
 import { ClientEvents } from "discord.js"
 import CommonSenseClient from "./CommonSenseClient"
 
-export default class ClientEvent<K extends keyof ClientEvents> {
+export default class<K extends keyof ClientEvents> {
     public readonly once: boolean
 
     public constructor (

@@ -1,4 +1,4 @@
-import { Colors, Formatters, TextChannel } from 'discord.js'
+import { TextChannel } from 'discord.js'
 import ClientEvent from "../../Structures/ClientEvent"
 import Logger from '../../Util/Logger'
 import Embed from '../../Util/Embed'

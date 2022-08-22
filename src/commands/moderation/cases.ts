@@ -1,5 +1,5 @@
 import { DocumentType } from '@typegoose/typegoose'
-import { APIEmbedField, Formatters, PermissionFlagsBits } from 'discord.js'
+import { APIEmbedField, PermissionFlagsBits, time } from 'discord.js'
 import GuildCasesModel, { GuildCases } from '../../Models/GuildCasesModel'
 import SlashCommand from '../../Structures/SlashCommand'
 import { SubcommandOption, UserOption } from '../../Structures/SlashCommandOptions'
@@ -48,7 +48,7 @@ export default new SlashCommand({
                             `Reason: ${c.reason}`,
                             `\u200B`,
                             `Moderator: ${moderator}`,
-                            `At: ${Formatters.time(c.timestamp, 'F')}, (${Formatters.time(c.timestamp, 'R')})`
+                            `At: ${time(c.timestamp, 'F')}, (${time(c.timestamp, 'R')})`
                         ].join('\n')
                     }
                 }))
@@ -83,7 +83,7 @@ export default new SlashCommand({
                             `Reason: ${c.reason}`,
                             `\u200B`,
                             `User: ${user}`,
-                            `At: ${Formatters.time(c.timestamp, 'F')}, (${Formatters.time(c.timestamp, 'R')})`
+                            `At: ${time(c.timestamp, 'F')}, (${time(c.timestamp, 'R')})`
                         ].join('\n')
                     }
                 }))

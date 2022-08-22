@@ -6,7 +6,7 @@ import { defaultImport } from '../Util/Common'
 import SlashCommand from './SlashCommand'
 import Logger from '../Util/Logger'
 
-export default class CommandHandler {
+export default class {
     public readonly commands = new Collection<string, SlashCommand>()
 
     public async registerCommands(commandsDirectory: string): Promise<void> {

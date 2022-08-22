@@ -1,20 +1,17 @@
-import { DocumentType } from '@typegoose/typegoose'
 import { PermissionFlagsBits } from 'discord.js'
-import GuildCasesModel, { CaseType, GuildCases } from '../../Models/GuildCasesModel'
+import GuildCasesModel, { CaseType } from '../../Models/GuildCasesModel'
 import SlashCommand from '../../Structures/SlashCommand'
 import { StringOption, UserOption } from '../../Structures/SlashCommandOptions'
 import Embed from '../../Util/Embed'
 
-const CASES_CACHE = new Map<string, DocumentType<GuildCases>>()
-
 export default new SlashCommand({
-    name: 'unban', category: 'moderation',
+    name: 'un-ban', category: 'moderation',
     description: 'Unbans {user}.',
     memberPerms: PermissionFlagsBits.BanMembers,
     botPerms: PermissionFlagsBits.BanMembers,
     options: [
-        new UserOption('user', 'The user to unban.', { required: true }),
-        new StringOption('reason', 'The reason for this unban.')
+        new UserOption('user', 'The user to un-ban.', { required: true }),
+        new StringOption('reason', 'The reason for this un-ban.')
     ]
 }, async (client, interaction) => {
     let { options, member, guild } = interaction
@@ -35,14 +32,9 @@ export default new SlashCommand({
         return await interaction.reply({ embeds: [Embed.warning('This user is not banned.')], ephemeral: true })
 
     let reason = options.getString('reason') ?? 'No reason provided.'
-
-    await guild.bans.remove(ban.user, reason)
-
-    if (!CASES_CACHE.has(guild.id))
-        CASES_CACHE.set(guild.id, await GuildCasesModel.get(guild.id))
-
-    let guildCases = CASES_CACHE.get(guild.id)!
+    let guildCases = await GuildCasesModel.get(guild.id)
     let caseId = await guildCases.addCase(CaseType.Unban, user.id, member.id, reason)
-
-    await interaction.reply({ embeds: [Embed.default(`Case #${caseId}: unban`, `${user} has been unbanned.`, member.user)] })
+    
+    await interaction.reply({ embeds: [Embed.default(`Case #${caseId}: un-ban`, `${user} has been un-banned.`, member.user)] })
+    await guild.bans.remove(ban.user, reason)
 })

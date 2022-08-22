@@ -1,5 +1,7 @@
 import { DocumentType, getModelForClass, modelOptions, prop, ReturnModelType, Severity } from '@typegoose/typegoose'    
 
+const CACHE = new Map<string, DocumentType<GuildCases>>()
+
 export enum CaseType {
     Warn = 'warn',
     Timeout = 'timeout',
@@ -41,13 +43,22 @@ export class GuildCases {
     public cases!: Case[]
 
     public static async get(this: ReturnModelType<typeof GuildCases>, guildId: string): Promise<DocumentType<GuildCases>> {
-        let doc = await this.findOne({ guildId }).exec()
+        let doc: DocumentType<GuildCases> | undefined | null
+        
+        doc = CACHE.get(guildId)
+
+        if (doc)
+            return doc
+
+        doc = await this.findOne({ guildId }).exec()
 
         if (!doc) {
             doc = await this.create({ guildId })
 
             await doc.save()
         }
+
+        CACHE.set(guildId, doc)
 
         return doc
     }

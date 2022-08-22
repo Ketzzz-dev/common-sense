@@ -5,11 +5,11 @@ import CommonSenseClient from './CommonSenseClient'
 import ClientEvent from './ClientEvent'
 import Logger from '../Util/Logger'
 
-export default class ClientEventHandler {
+export default class {
     public constructor (private client: CommonSenseClient) {}
 
     public async registerEvents(eventsDirectory: string): Promise<void> {
-        Logger.info('Registering events..')
+        Logger.info('Registering client events...')
 
         let eventsPath = join(__dirname, '..', eventsDirectory)
 
@@ -31,6 +31,6 @@ export default class ClientEventHandler {
             Logger.info('%s: %s - registered!', event.key, file)
         }
 
-        Logger.info('Events registered successfully!')
+        Logger.info('Client events registered successfully!')
     }
 }

@@ -13,7 +13,7 @@ export interface ISlashCommandConfig {
     options?: SlashCommandOption[]
 }
 
-export default class SlashCommand {
+export default class {
     public readonly name: string
     public readonly category: string
     public readonly description: string

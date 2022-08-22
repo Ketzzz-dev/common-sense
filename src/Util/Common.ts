@@ -1,5 +1,4 @@
 import { ClientUser, MessagePayload, PermissionFlagsBits, PermissionsBitField, TextChannel, WebhookMessageOptions } from 'discord.js'
-import { it } from 'node:test'
 
 export const MODERATOR = PermissionsBitField.resolve([
     PermissionFlagsBits.BanMembers, PermissionFlagsBits.ChangeNickname,

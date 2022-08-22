@@ -4,7 +4,7 @@ import Logger from '../Util/Logger'
 import ClientEventHandler from './ClientEventHandler'
 import SlashCommandHandler from './SlashCommandHandler'
 
-export default class CommonSenseClient extends Client<true> {
+export default class extends Client<true> {
     public readonly eventHandler = new ClientEventHandler(this)
     public readonly commandHandler = new SlashCommandHandler()
 
@@ -37,7 +37,7 @@ export default class CommonSenseClient extends Client<true> {
 
             await this.login(process.env.BOT_TOKEN!)
         } catch (error) {
-            Logger.error('Unable to connect to database: ', error)
+            Logger.error('Unable to connect to database:', error)
         }
     }
 }

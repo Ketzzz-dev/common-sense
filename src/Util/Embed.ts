@@ -1,6 +1,6 @@
 import { APIEmbed, APIEmbedField, Colors, Formatters, User } from 'discord.js'
 
-export default class Embed {
+export default class extends null {
     private constructor () {}
 
     public static default(title: string, description: string, author: User, ...fields: APIEmbedField[]): APIEmbed {
@@ -32,6 +32,13 @@ export default class Embed {
             color: Colors.Red,
             title: `Error while executing ${commandName}`,
             description: Formatters.codeBlock(`${error}`),
+            timestamp: new Date().toISOString()
+        }
+    }
+    public static log(action: string, message: string, ...fields: APIEmbedField[]): APIEmbed {
+        return {
+            color: Colors.Blurple, fields,
+            title: action, description: message,
             timestamp: new Date().toISOString()
         }
     }

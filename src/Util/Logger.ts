@@ -2,7 +2,7 @@ import { cyan, yellow, red, gray } from 'colors/safe'
 import { format } from 'util'
 import { getTime } from './Common'
 
-export default class Logger {
+export default class extends null {
     private constructor() {}
 
     public static clear(): void {

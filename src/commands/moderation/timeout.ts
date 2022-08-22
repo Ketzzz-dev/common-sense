@@ -1,13 +1,10 @@
-import { DocumentType } from '@typegoose/typegoose'
 import { PermissionFlagsBits } from 'discord.js'
 import ms from 'ms'
-import GuildCasesModel, { CaseType, GuildCases } from '../../Models/GuildCasesModel'
+import GuildCasesModel, { CaseType } from '../../Models/GuildCasesModel'
 import SlashCommand from '../../Structures/SlashCommand'
 import { StringOption, UserOption } from '../../Structures/SlashCommandOptions'
 import { MODERATOR, MS_REGEXP } from '../../Util/Common'
 import Embed from '../../Util/Embed'
-
-const CASES_CACHE = new Map<string, DocumentType<GuildCases>>()
 
 export default new SlashCommand({
     name: 'timeout', category: 'moderation',
@@ -48,11 +45,7 @@ export default new SlashCommand({
         return await interaction.reply({ embeds: [Embed.warning('A timeout must be less than 28 days.')], ephemeral: true })
 
     let reason = options.getString('reason') ?? 'No reason provided.'
-
-    if (!CASES_CACHE.has(guild.id))
-        CASES_CACHE.set(guild.id, await GuildCasesModel.get(guild.id))
-
-    let guildCases = CASES_CACHE.get(guild.id)!
+    let guildCases = await GuildCasesModel.get(guild.id)
     let caseId = await guildCases.addCase(CaseType.Timeout, user.id, member.id, reason)
     
     try {
@@ -67,4 +60,5 @@ export default new SlashCommand({
     } finally {
         await user.timeout(time, reason)
     }
+
 })
