@@ -49,3 +49,6 @@ export function setLongTimeout<A extends any[]>(callback: (...args: A) => void, 
         }
     })
 }
+export function capitalize(text: string): string {
+    return text.charAt(0).toUpperCase() + text.slice(1)
+}

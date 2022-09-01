@@ -1,10 +1,12 @@
+import { PrismaClient } from '@prisma/client'
 import { ActivityType, Client, GatewayIntentBits, Partials } from "discord.js"
-import { connect } from 'mongoose'
 import Logger from '../Util/Logger'
 import ClientEventHandler from './ClientEventHandler'
 import SlashCommandHandler from './SlashCommandHandler'
 
 export default class extends Client<true> {
+    public readonly prisma = new PrismaClient()
+
     public readonly eventHandler = new ClientEventHandler(this)
     public readonly commandHandler = new SlashCommandHandler()
 
@@ -30,14 +32,10 @@ export default class extends Client<true> {
         await this.eventHandler.registerEvents('events/client')
         await this.commandHandler.registerCommands('commands')
 
-        try {
-            await connect(process.env.MONGO_URI!)
+        await this.prisma.$connect()
 
-            Logger.info('Successfully connected to the database!')
+        Logger.info('Connected to the database!')
 
-            await this.login(process.env.BOT_TOKEN!)
-        } catch (error) {
-            Logger.error('Unable to connect to database:', error)
-        }
+        await this.login(process.env.BOT_TOKEN!)
     }
 }

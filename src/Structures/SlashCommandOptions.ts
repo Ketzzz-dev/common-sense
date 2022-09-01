@@ -77,7 +77,8 @@ export class IntegerOption implements SlashCommandOption {
             required?: boolean,
             minValue?: number,
             maxValue?: number,
-            choices?: APIApplicationCommandOptionChoice<number>[]
+            choices?: APIApplicationCommandOptionChoice<number>[],
+            autocomplete?: boolean
         }
     ) {}
 
@@ -92,8 +93,10 @@ export class IntegerOption implements SlashCommandOption {
             json.min_value = this.config.minValue
         if (this.config?.maxValue)
             json.max_value = this.config.maxValue
-        if (this.config?.choices)
+        if (!this.config?.autocomplete && this.config?.choices)
             json.choices = this.config.choices
+        if (!this.config?.choices && this.config?.autocomplete)
+            json.autocomplete = this.config.autocomplete as false
 
         return json
     }
@@ -125,7 +128,8 @@ export class NumberOption implements SlashCommandOption {
             required?: boolean,
             minValue?: number,
             maxValue?: number,
-            choices?: APIApplicationCommandOptionChoice<number>[]
+            choices?: APIApplicationCommandOptionChoice<number>[],
+            autocomplete?: boolean
         }
     ) {}
 
@@ -140,8 +144,10 @@ export class NumberOption implements SlashCommandOption {
             json.min_value = this.config.minValue
         if (this.config?.maxValue)
             json.max_value = this.config.maxValue
-        if (this.config?.choices)
+        if (!this.config?.autocomplete && this.config?.choices)
             json.choices = this.config.choices
+        if (!this.config?.choices && this.config?.autocomplete)
+            json.autocomplete = this.config.autocomplete as false
 
         return json
     }
@@ -171,7 +177,8 @@ export class StringOption implements SlashCommandOption {
             required?: boolean,
             minLength?: number,
             maxLength?: number,
-            choices?: APIApplicationCommandOptionChoice<string>[]
+            choices?: APIApplicationCommandOptionChoice<string>[],
+            autocomplete?: boolean
         }
     ) {}
 
@@ -186,8 +193,10 @@ export class StringOption implements SlashCommandOption {
             json.min_length = this.config.minLength
         if (this.config?.maxLength)
             json.max_length = this.config.maxLength
-        if (this.config?.choices)
+        if (!this.config?.autocomplete && this.config?.choices)
             json.choices = this.config.choices
+        if (!this.config?.choices && this.config?.autocomplete)
+            json.autocomplete = this.config.autocomplete as false
 
         return json
     }

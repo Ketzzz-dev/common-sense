@@ -1,7 +1,7 @@
 import { TextChannel } from 'discord.js'
 import ClientEvent from "../../Structures/ClientEvent"
 import Logger from '../../Util/Logger'
-import Embed from '../../Util/Embed'
+import Embeds from '../../Util/Embeds'
 import { sendWebhook } from '../../Util/Common'
 
 export default new ClientEvent('interactionCreate', async (client, interaction) => {
@@ -14,7 +14,7 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
 
     if (!command)
         return await interaction.reply({
-            embeds: [Embed.warning(`Unknown command: \`${commandName}\`.`)],
+            embeds: [Embeds.warning(`Unknown command: \`${commandName}\`.`)],
             ephemeral: true
         })
 
@@ -26,7 +26,7 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
         let missing = me.permissions.missing(botPerms)
 
         return await interaction.reply({
-            embeds: [Embed.warning(`Missing permissions: ${missing.map(perm => `\`${perm.replace(/\B([A-Z])/g, ' $1')}\``)}.`)],
+            embeds: [Embeds.warning(`Missing permissions: ${missing.map(perm => `\`${perm.replace(/\B([A-Z])/g, ' $1')}\``)}.`)],
             ephemeral: true
         })
     }
@@ -35,7 +35,7 @@ export default new ClientEvent('interactionCreate', async (client, interaction) 
         await command.execute(client, interaction)
     } catch (error) {
         await sendWebhook(client.user, channel as TextChannel, {
-            embeds: [Embed.error(command.name, error)]
+            embeds: [Embeds.error(command.name, error)]
         })
 
         Logger.error('Error while executing %s:', name, error)
