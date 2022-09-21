@@ -1,6 +1,10 @@
-import ClientEvent from "../../Structures/ClientEvent"
-import Logger from '../../Util/Logger'
+import { ClientEvent } from '../../structs/ClientEvent'
+import { Logger } from '../../util/Logger'
 
-export default new ClientEvent('ready', async (client) => {
-    Logger.info('Logged in as %s!', client.user.tag)
-})
+export default {
+	name: 'ready',
+
+	async emit(client): Promise<any> {
+		Logger.info(`Logged in as ${client.user.tag}!`)
+	}
+} as ClientEvent<'ready'>

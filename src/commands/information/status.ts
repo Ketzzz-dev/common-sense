@@ -1,27 +1,30 @@
-import { time } from 'discord.js'
-import SlashCommand from '../../Structures/SlashCommand'
-import Embed from '../../Util/Embeds'
+import { Command } from '../../structs/Command'
+import { Client } from '../../structs/Client'
+import { ChatInputCommandInteraction, EmbedBuilder, time } from 'discord.js'
 
-export default new SlashCommand({
-    name: 'status', category: 'information',
-    description: 'Provides an embed of the bot\'s current status.',
-}, async (client, interaction) => {
-    let { ws, readyAt } = client
-    let { createdTimestamp } = interaction
+export default {
+	name: 'status', category: 'information',
+	description: 'Provides an embed of the bots current status.',
+	async execute(client: Client, interaction: ChatInputCommandInteraction<'cached'>): Promise<string | undefined | null> {
+		let sent = await interaction.deferReply({ fetchReply: true })
 
-    let sentMessage = await interaction.deferReply({ fetchReply: true })
+		await interaction.editReply({
+			embeds: [
+				new EmbedBuilder()
+					.setColor('Fuchsia')
+					.addFields(
+						{
+							name: 'Ping', inline: true,
+							value: `API: \`${client.ws.ping} ms\`, Bot: \`${sent.createdTimestamp - interaction.createdTimestamp} ms\``
+						},
+						{
+							name: 'Uptime', inline: true,
+							value: time(client.readyAt, 'R')
+						}
+					)
+			]
+		})
 
-    await interaction.editReply({
-        embeds: [
-            Embed.info(
-                'Here is an embed of the bot\'s current status.',
-                {
-                    name: 'Ping',
-                    value: `API: \`${ws.ping} ms\`, Bot: \`${sentMessage.createdTimestamp - createdTimestamp} ms\``,
-                    inline: true
-                },
-                { name: 'Uptime', value: time(readyAt, 'R'), inline: true }
-            )
-        ]
-    })
-})
+		return
+	}
+} as Command
