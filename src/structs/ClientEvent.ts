@@ -1,9 +1,9 @@
 import { ClientEvents } from 'discord.js'
-import { Client } from './Client'
+import { CommonSenseClient } from './CommonSenseClient'
 
 export interface ClientEvent<K extends keyof ClientEvents> {
     readonly once?: boolean
     readonly name: K
 
-    emit(client: Client, ...args: ClientEvents[K]): any
+    emit(client: CommonSenseClient, ...args: ClientEvents[K]): any
 }

@@ -7,7 +7,7 @@ import { defaultImport } from '../util/Common'
 import { ClientEvent } from './ClientEvent'
 import { REST } from '@discordjs/rest'
 
-export class Client extends BaseClient<true> {
+export class CommonSenseClient extends BaseClient<true> {
     public readonly commands = new Collection<string, Command>()
 
     public constructor () {
@@ -20,7 +20,7 @@ export class Client extends BaseClient<true> {
             allowedMentions: { repliedUser: false },
             partials: [Partials.Message],
             presence: { 
-                activities: [{ name: 'trouble', type: ActivityType.Watching }]
+                activities: [{ name: 'for trouble...', type: ActivityType.Watching }]
             }
         })
     }
@@ -48,7 +48,7 @@ export class Client extends BaseClient<true> {
             Logger.info(`${event.name}: ${file} - registered!`)
         }
 
-        Logger.info('Client events registered successfully!')
+        Logger.info('CommonSenseClient events registered successfully!')
     }
     private async registerCommands(commandsDir: string): Promise<void> {
         Logger.info('Registering commands')

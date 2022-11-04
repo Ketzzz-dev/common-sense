@@ -2,7 +2,7 @@ import { gray, cyan, red, yellow } from 'colors/safe'
 import { getTime } from './Common'
 import { format } from 'util'
 
-export namespace Logger {
+export module Logger {
 	export function clear(): void {
 		console.clear()
 	}

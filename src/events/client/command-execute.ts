@@ -3,6 +3,7 @@ import { Logger } from '../../util/Logger'
 
 export default {
 	name: 'interactionCreate',
+
 	async emit(client, interaction): Promise<any> {
 		if (!interaction.isChatInputCommand() || !interaction.inCachedGuild())
 			return
@@ -11,11 +12,7 @@ export default {
 
 		let command = client.commands.get(commandName)
 
-		if (!command)
-			return await interaction.reply({
-				content: `Unknown command: \`${commandName}\`.`,
-				ephemeral: true
-			})
+		if (!command) return await interaction.reply({ content: `Unknown command: \`${commandName}\`.`, ephemeral: true })
 
 		let { botPerms, name } = command
 
@@ -24,16 +21,16 @@ export default {
 		if (botPerms && !me.permissions.has(botPerms)) {
 			let missing = me.permissions.missing(botPerms)
 
-			return await interaction.reply({
-				content: `Missing permissions: ${missing.map(perm => `\`${perm.replace(/\B([A-Z])/g, ' $1')}\``)}.`,
-				ephemeral: true
-			})
+			return await interaction.reply({ content: `Missing permissions: ${missing.map(perm => `\`${perm.replace(/\B([A-Z])/g, ' $1')}\``)}.`, ephemeral: true })
 		}
 
 		try {
 			let error = await command.execute(client, interaction)
 
-			// TODO: do something with 'error'.
+			if (error) {
+				// TODO: log error or something.
+				return await interaction.reply({ content: error, ephemeral: true })
+			}
 		} catch (error) {
 			// TODO: har har...
 			// await sendWebhook(client.user, channel as TextChannel, {
