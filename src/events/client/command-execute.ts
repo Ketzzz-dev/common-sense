@@ -28,7 +28,6 @@ export default {
 			let error = await command.execute(client, interaction)
 
 			if (error) {
-				// TODO: log error or something.
 				return await interaction.reply({ content: error, ephemeral: true })
 			}
 		} catch (error) {

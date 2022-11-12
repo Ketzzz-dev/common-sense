@@ -8,6 +8,8 @@ import { ClientEvent } from './ClientEvent'
 import { REST } from '@discordjs/rest'
 
 export class CommonSenseClient extends BaseClient<true> {
+    public static EMBED_COLOR = 0xf47333
+
     public readonly commands = new Collection<string, Command>()
 
     public constructor () {
@@ -78,10 +80,9 @@ export class CommonSenseClient extends BaseClient<true> {
         }
 
         let rest = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN!)
-        let route = process.env.MODE! == 'dev' ? Routes.applicationGuildCommands(process.env.CLIENT_ID!, process.env.GUILD_ID!) : Routes.applicationCommands(process.env.CLIENT_ID!)
 
         try {
-            await rest.put(route, { body: this.commands.map(Command.toJSON) })
+            await rest.put(Routes.applicationCommands(process.env.CLIENT_ID!), { body: this.commands.map(Command.toJSON) })
 
             Logger.info('Commands registered successfully!')
         } catch (error) {
@@ -92,6 +93,7 @@ export class CommonSenseClient extends BaseClient<true> {
     public async start(): Promise<void> {
         await this.registerEvents('events/client')
         await this.registerCommands('commands')
+
 
         await this.login(process.env.BOT_TOKEN!)
     }

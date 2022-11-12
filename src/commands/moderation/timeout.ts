@@ -41,16 +41,16 @@ export default {
 		if (!user.moderatable) return 'I cannot moderate this user.'
 		if (member.roles.highest.comparePositionTo(user.roles.highest) <= 0) return 'You can\'t moderate members with the same or higher role as you.'
 
-		await user.timeout(timeout, reason)
-
 		try {
+			let timeValue = `Length: \`${ms(timeout, { long: true })}\`\nUntil: ${time(new Date(Date.now() + timeout), 'F')}`
+
 			let infoEmbed = new EmbedBuilder()
-				.setColor('Fuchsia')
+				.setColor(CommonSenseClient.EMBED_COLOR)
 				.setDescription(`${user} has been timed out.`)
 				.addFields(
 					{
 						name: 'Time', inline: true,
-						value: `Length: \`${ms(timeout, { long: true })}\`\nUntil: ${time(new Date(Date.now() + timeout), 'F')}`
+						value: timeValue
 					},
 					{
 						name: 'Reason', inline: true,
@@ -63,7 +63,7 @@ export default {
 				.addFields(
 					{
 						name: 'Time', inline: true,
-						value: `Length: \`${ms(timeout, { long: true })}\`\nUntil: ${time(Date.now() + timeout, 'F')}`
+						value: timeValue
 					},
 					{
 						name: 'Reason', inline: true,
@@ -75,6 +75,8 @@ export default {
 			await user.send({ embeds: [dmEmbed] })
 		} catch (error) {
 			return 'Unable to DM user but their case was logged.'
+		} finally {
+			await user.timeout(timeout, reason)
 		}
 
 		return

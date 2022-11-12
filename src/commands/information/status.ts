@@ -9,7 +9,7 @@ export default {
 		let sent = await interaction.deferReply({ fetchReply: true })
 
 		let embed = new EmbedBuilder()
-			.setColor('Fuchsia')
+			.setColor(CommonSenseClient.EMBED_COLOR)
 			.addFields(
 				{
 					name: 'Ping', inline: true,
