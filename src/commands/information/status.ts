@@ -1,19 +1,19 @@
-import { Command } from '../../structs/Command'
-import { CommonSenseClient } from '../../structs/CommonSenseClient'
-import { ChatInputCommandInteraction, EmbedBuilder, time } from 'discord.js'
+import { EmbedBuilder, time } from 'discord.js'
+import Command from '../../structures/Command'
 
 export default {
-	name: 'status', category: 'information',
-	description: 'Provides an embed of the bots current status.',
-	async execute(client: CommonSenseClient, interaction: ChatInputCommandInteraction<'cached'>): Promise<string | undefined | null> {
-		let sent = await interaction.deferReply({ fetchReply: true })
+	name: 'status',
+	description: 'Provides an embed of the bot\'s current status.',
 
-		let embed = new EmbedBuilder()
-			.setColor(CommonSenseClient.EMBED_COLOR)
+	async execute(client, interaction) {
+		let deferredMessage = await interaction.deferReply({ fetchReply: true })
+
+		let statusEmbed = new EmbedBuilder()
+			.setColor(client.color)
 			.addFields(
 				{
 					name: 'Ping', inline: true,
-					value: `API: \`${client.ws.ping} ms\`\nBot: \`${sent.createdTimestamp - interaction.createdTimestamp} ms\``
+					value: `API: \`${client.ws.ping} ms\`\nBot: \`${deferredMessage.createdTimestamp - interaction.createdTimestamp} ms\``
 				},
 				{
 					name: 'Uptime', inline: true,
@@ -21,8 +21,6 @@ export default {
 				}
 			)
 
-		await interaction.editReply({ embeds: [embed.toJSON()] })
-
-		return
+		await interaction.editReply({ embeds: [statusEmbed.toJSON()] })
 	}
 } as Command

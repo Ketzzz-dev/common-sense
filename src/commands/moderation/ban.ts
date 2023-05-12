@@ -1,86 +1,90 @@
-import { ChatInputCommandInteraction, codeBlock, EmbedBuilder, PermissionFlagsBits, time } from 'discord.js'
-import ms from 'ms'
-import { Command } from '../../structs/Command'
-import { CommonSenseClient } from '../../structs/CommonSenseClient'
-import { MS_REGEXP } from '../../util/Common'
-import { setTimeout } from 'long-timeout'
-
-const MAX_BAN_LENGTH = ms('1y')
+import { Colors, EmbedBuilder, PermissionsBitField } from 'discord.js'
+import Command, { Options } from '../../structures/Command'
 
 export default {
-	name: 'ban', category: 'moderation',
-	description: 'Bans a user indefinitely or for a period of time.',
-
-	memberPerms: PermissionFlagsBits.BanMembers, botPerms: PermissionFlagsBits.BanMembers,
+	name: 'ban', description: 'Bans a member permanently.',
+	memberPerms: [PermissionsBitField.Flags.BanMembers],
 	options: [
-		Command.Options.user('user', 'The user to ban.', { required: true }),
-		Command.Options.string('length', 'The length of the ban, permanent by default.'),
-		Command.Options.string('reason', 'The reason of the ban.')
+		Options.user('member', 'The member to ban.', true),
+		Options.string('reason', 'The reason.', false, 1)
 	],
+	async execute(client, interaction) {
+		const member = interaction.options.getMember('member')
+		const reason = interaction.options.getString('reason') ?? 'No reason.'
 
-	async execute(client: CommonSenseClient, interaction: ChatInputCommandInteraction<'cached'>): Promise<string | undefined | null> {
-		let { options, member, guild } = interaction
+		const errorEmbed = new EmbedBuilder()
+			.setColor(Colors.Greyple)
 
-		// getting options
-		let user = options.getMember('user')
-		let length = options.getString('length')
-		let reason = options.getString('reason') ?? 'No reason.'
-
-		// validating options
-		if (!user) return 'Unable to find user.'
-		if (length && !length.match(MS_REGEXP)) return 'Invalid string option, \'length\' must be ms parsable (ex: `60s`, `5m`, `1h`).'
-
-		let timeout = length ? ms(length) : null
-
-		if (timeout && timeout < 0) return 'Invalid string option, \'length\' cannot be negative.'
-		if (timeout && timeout > MAX_BAN_LENGTH) return 'Invalid string option, \'length\' cannot be more than a year.'
-
-		// checking permissions
-		if (user.id == member.id) return 'You cannot ban yourself, silly.'
-		if (user.id == client.user.id) return 'You cannot ban me, silly.'
-		if (!user.moderatable) return 'I cannot ban this user.'
-		if (member.roles.highest.comparePositionTo(user.roles.highest) <= 0) return 'You can\'t ban members with the same or higher role as you.'
+		if (!member)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('Member not found.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		else if (member.id === interaction.member.id)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('You can\'t ban yourself, silly.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		else if (member.id === client.user.id)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('You can\'t ban me, silly.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		else if (member.roles.highest.position >= interaction.member.roles.highest.position)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('You can\'t ban members with the same or higher role than you.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		else if (!member.bannable)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('I cannot ban this member.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
 
 		try {
-			let timeValue = timeout ? `Length: \`${ms(timeout, { long: true })}\`\nUntil: ${time(new Date(Date.now() + timeout), 'F')}` : 'Indefinite'
+			await interaction.deferReply()
 
-			let infoEmbed = new EmbedBuilder()
-				.setColor(CommonSenseClient.EMBED_COLOR)
-				.setDescription(`${user} has been banned.`)
-				.addFields(
-					{
-						name: 'Time', inline: true,
-						value: timeValue
-					},
-					{
-						name: 'Reason', inline: true,
-						value: codeBlock(reason)
-					}
-				)
-			let dmEmbed = new EmbedBuilder()
-				.setColor('Red')
-				.setDescription(`You have been banned from ${guild}.`)
-				.addFields(
-					{
-						name: 'Time', inline: true,
-						value: timeValue
-					},
-					{
-						name: 'Reason', inline: true,
-						value: codeBlock(reason)
-					}
-				)
+			const emoji = client.emojis.cache.get('1106557780858515466')!
+			const dmEmbed = new EmbedBuilder().setColor(client.color)
+				.setTitle(`${emoji} You have been banned from ${interaction.guild.name}!`)
+				.setDescription(reason)
+				.setTimestamp()
+			const replyEmbed = new EmbedBuilder().setColor(client.color)
+				.setDescription(`${emoji} ${member} has been banned ${interaction.guild.name}!`)
 
-			await interaction.reply({ embeds: [infoEmbed] })
-			await user.send({ embeds: [dmEmbed] })
+			await member.send({
+				embeds: [dmEmbed.toJSON()]
+			})
+			await member.ban({ reason, deleteMessageSeconds: 604800 })
+			await interaction.editReply({
+				embeds: [replyEmbed.toJSON()]
+			})
 		} catch (error) {
-			return 'Unable to DM user but their case was logged.'
-		} finally {
-			let banned = await user.ban({ reason, deleteMessageDays: 7 })
+			console.error(error)
 
-			if (timeout) setTimeout(() => guild.members.unban(banned, 'time expired'), timeout)
+			await interaction.deleteReply()
+			await interaction.followUp({
+				embeds: [
+					errorEmbed.setDescription(`I couldn't DM this user.`)
+						.toJSON()
+				],
+				ephemeral: true
+			})
 		}
-
-		return
 	}
 } as Command

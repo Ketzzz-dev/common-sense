@@ -1,6 +1,11 @@
 import 'dotenv/config'
-import { CommonSenseClient } from './structs/CommonSenseClient'
+import Client from './structures/Client'
 
-const CLIENT = new CommonSenseClient
+const client = new Client()
 
-CLIENT.start()
+;(async () => {
+	await client.loadEvents()
+	await client.loadCommands()
+
+	await client.start()
+})()

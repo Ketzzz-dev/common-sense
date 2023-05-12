@@ -1,84 +1,121 @@
-import { Command } from '../../structs/Command'
-import { ChatInputCommandInteraction, codeBlock, EmbedBuilder, PermissionFlagsBits, time } from 'discord.js'
-import { CommonSenseClient } from '../../structs/CommonSenseClient'
-import { MS_REGEXP } from '../../util/Common'
+import { Colors, EmbedBuilder, PermissionsBitField } from 'discord.js'
 import ms from 'ms'
-
-const THIRTY_MINS = ms('30m')
-const MAX_TIMEOUT_LEN = ms('28d')
+import Command, { Options } from '../../structures/Command'
 
 export default {
-	name: 'timeout', category: 'moderation',
-	description: 'Timeouts a user for a period of time.',
-
-	memberPerms: PermissionFlagsBits.ModerateMembers, botPerms: PermissionFlagsBits.ModerateMembers,
+	name: 'timeout', description: 'Times a member out and deducts their reputation.',
+	memberPerms: [PermissionsBitField.Flags.ModerateMembers],
 	options: [
-		Command.Options.user('user', 'The user to timeout.', { required: true }),
-		Command.Options.string('length', 'The length of the timeout, 30m by default.'),
-		Command.Options.string('reason', 'The reason of the timeout.')
+		Options.user('member', 'The member to timeout.', true),
+		Options.string('length', 'The duration of the timeout.', true),
+		Options.string('reason', 'The reason.', false, 1)
 	],
+	async execute(client, interaction) {
+		const member = interaction.options.getMember('member')
+		const length = interaction.options.getString('length', true)
+		const reason = interaction.options.getString('reason') ?? 'No reason.'
 
-	async execute(client: CommonSenseClient, interaction: ChatInputCommandInteraction<'cached'>): Promise<string | undefined | null> {
-		let { options, member, guild } = interaction
+		const errorEmbed = new EmbedBuilder()
+			.setColor(Colors.Greyple)
 
-		// getting options
-		let user = options.getMember('user')
-		let length = options.getString('length')
-		let reason = options.getString('reason') ?? 'No reason.'
+		if (!member)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('Member not found.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		else if (member.id === interaction.member.id)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('You can\'t time yourself out, silly.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		else if (member.id === client.user.id)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('You can\'t time me out, silly.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		else if (member.roles.highest.position >= interaction.member.roles.highest.position)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('You can\'t time members out with the same or higher role than you.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		else if (!member.moderatable)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('I cannot moderate this member.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
 
-		// validating options
-		if (!user) return 'Unable to find user.'
-		if (length && !length.match(MS_REGEXP)) return 'Invalid string option, \'length\' must be ms parsable (ex: `60s`, `5m`, `1h`).'
+		const time = ms(length)
 
-		let timeout = length ? ms(length) : THIRTY_MINS
-
-		if (timeout < 0) return 'Invalid string option, \'length\' cannot be negative.'
-		if (timeout > MAX_TIMEOUT_LEN) return 'Invalid string option, \'length\' cannot be more than 28 days.'
-
-		// checking permissions
-		if (user.id == member.id) return 'You cannot moderate yourself, silly.'
-		if (user.id == client.user.id) return 'You cannot moderate me, silly.'
-		if (!user.moderatable) return 'I cannot moderate this user.'
-		if (member.roles.highest.comparePositionTo(user.roles.highest) <= 0) return 'You can\'t moderate members with the same or higher role as you.'
+		if (time === undefined)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('Option "length" is invalid; example: `30s`, `5m`, `6h`, `3d`, `1w`.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		else if (time < 1000)
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('Option "length" is invalid; cannot be less than 1 second.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		else if (time > ms('28d'))
+			return await interaction.reply({
+				embeds: [
+					errorEmbed.setDescription('Option "length" is invalid; cannot be greater than 28 days.')
+						.toJSON()
+				],
+				ephemeral: true
+			})
 
 		try {
-			let timeValue = `Length: \`${ms(timeout, { long: true })}\`\nUntil: ${time(new Date(Date.now() + timeout), 'F')}`
+			await interaction.deferReply()
 
-			let infoEmbed = new EmbedBuilder()
-				.setColor(CommonSenseClient.EMBED_COLOR)
-				.setDescription(`${user} has been timed out.`)
-				.addFields(
-					{
-						name: 'Time', inline: true,
-						value: timeValue
-					},
-					{
-						name: 'Reason', inline: true,
-						value: codeBlock(reason)
-					}
-				)
-			let dmEmbed = new EmbedBuilder()
-				.setColor('Red')
-				.setDescription(`You have been timed out from ${guild}.`)
-				.addFields(
-					{
-						name: 'Time', inline: true,
-						value: timeValue
-					},
-					{
-						name: 'Reason', inline: true,
-						value: codeBlock(reason)
-					}
-				)
+			const duration = ms(time, { long: true })
+			const emoji = client.emojis.cache.get('1038962582675001416')!
+			const dmEmbed = new EmbedBuilder().setColor(client.color)
+				.setTitle(`${emoji} You have been timed out in ${interaction.guild.name} for ${duration}!`)
+				.setDescription(reason)
+				.setTimestamp()
+			const replyEmbed = new EmbedBuilder().setColor(client.color)
+				.setDescription(`${emoji} ${member} has been timed out for ${duration}!`)
 
-			await interaction.reply({ embeds: [infoEmbed] })
-			await user.send({ embeds: [dmEmbed] })
+			await member.send({
+				embeds: [dmEmbed.toJSON()]
+			})
+			await member.timeout(time, reason)
+			await interaction.editReply({
+				embeds: [replyEmbed.toJSON()]
+			})
 		} catch (error) {
-			return 'Unable to DM user but their case was logged.'
-		} finally {
-			await user.timeout(timeout, reason)
-		}
+			console.error(error)
 
-		return
+			await interaction.deleteReply()
+			await interaction.followUp({
+				embeds: [
+					errorEmbed.setDescription(`I couldn't DM this user.`)
+						.toJSON()
+				],
+				ephemeral: true
+			})
+		}
 	}
 } as Command
