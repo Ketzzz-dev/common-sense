@@ -10,6 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id String @id @map("_id")
+model Guild {
+  id         String @id @map("_id")
+  nextCaseId Int    @default(1)
+  cases      Case[]
+}
+
+type Case {
+  id     Int
+  action Action
+  user   String
+  mod    String
+  reason String
+}
+
+enum Action {
+  BAN
+  KICK
+  TIMEOUT
+  WARN
 }

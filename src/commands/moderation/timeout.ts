@@ -86,35 +86,61 @@ export default {
 				ephemeral: true
 			})
 
+		const duration = ms(time, { long: true })
+		const emoji = client.emojis.cache.get('1038962582675001416')!
+
 		try {
 			await interaction.deferReply()
 
-			const duration = ms(time, { long: true })
-			const emoji = client.emojis.cache.get('1038962582675001416')!
 			const dmEmbed = new EmbedBuilder().setColor(client.color)
 				.setTitle(`${emoji} You have been timed out in ${interaction.guild.name} for ${duration}!`)
 				.setDescription(reason)
 				.setTimestamp()
-			const replyEmbed = new EmbedBuilder().setColor(client.color)
-				.setDescription(`${emoji} ${member} has been timed out for ${duration}!`)
 
 			await member.send({
 				embeds: [dmEmbed.toJSON()]
 			})
-			await member.timeout(time, reason)
-			await interaction.editReply({
-				embeds: [replyEmbed.toJSON()]
-			})
 		} catch (error) {
 			console.error(error)
 
-			await interaction.deleteReply()
 			await interaction.followUp({
 				embeds: [
-					errorEmbed.setDescription(`I couldn't DM this user.`)
+					errorEmbed.setDescription(`I couldn't DM this user, but their case was logged.`)
 						.toJSON()
 				],
 				ephemeral: true
+			})
+		} finally {
+			const timed = await member.timeout(time, reason)
+			const replyEmbed = new EmbedBuilder().setColor(client.color)
+				.setDescription(`${emoji} ${member} has been timed out for ${duration}!`)
+
+			let guild = await client.prisma.guild.findUnique({
+				where: { id: interaction.guildId }
+			})
+
+			if (!guild)
+				guild = await client.prisma.guild.create({
+					data: {
+						id: interaction.guildId
+					}
+				})
+
+			guild.cases.push({
+				id: guild.nextCaseId,
+				reason, user: timed.id, mod: interaction.member.id,
+				action: 'TIMEOUT'
+			})
+
+			await client.prisma.guild.update({
+				where: { id: interaction.guildId },
+				data: {
+					nextCaseId: { increment: 1 },
+					cases: guild.cases
+				}
+			})
+			await interaction.editReply({
+				embeds: [replyEmbed.toJSON()]
 			})
 		}
 	}

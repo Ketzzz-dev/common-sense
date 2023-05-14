@@ -56,34 +56,61 @@ export default {
 				ephemeral: true
 			})
 
+		const emoji = client.emojis.cache.get('1106557780858515466')!
+
 		try {
 			await interaction.deferReply()
 
-			const emoji = client.emojis.cache.get('1106557780858515466')!
 			const dmEmbed = new EmbedBuilder().setColor(client.color)
 				.setTitle(`${emoji} You have been banned from ${interaction.guild.name}!`)
 				.setDescription(reason)
 				.setTimestamp()
-			const replyEmbed = new EmbedBuilder().setColor(client.color)
-				.setDescription(`${emoji} ${member} has been banned ${interaction.guild.name}!`)
 
 			await member.send({
 				embeds: [dmEmbed.toJSON()]
 			})
-			await member.ban({ reason, deleteMessageSeconds: 604800 })
-			await interaction.editReply({
-				embeds: [replyEmbed.toJSON()]
-			})
 		} catch (error) {
 			console.error(error)
 
-			await interaction.deleteReply()
 			await interaction.followUp({
 				embeds: [
-					errorEmbed.setDescription(`I couldn't DM this user.`)
+					errorEmbed.setDescription(`I couldn't DM this user, but their case was logged.`)
 						.toJSON()
 				],
 				ephemeral: true
+			})
+		} finally {
+			const banned = await member.ban({ reason, deleteMessageSeconds: 604800 })
+			const replyEmbed = new EmbedBuilder().setColor(client.color)
+				.setDescription(`${emoji} ${banned} has been banned!`)
+
+			let guild = await client.prisma.guild.findUnique({
+				where: { id: interaction.guildId }
+			})
+
+			if (!guild)
+				guild = await client.prisma.guild.create({
+					data: {
+						id: interaction.guildId
+					}
+				})
+
+			guild.cases.push({
+				id: guild.nextCaseId,
+				reason, user: banned.id, mod: interaction.member.id,
+				action: 'BAN'
+			})
+
+			await client.prisma.guild.update({
+				where: { id: interaction.guildId },
+				data: {
+					nextCaseId: { increment: 1 },
+					cases: guild.cases
+				}
+			})
+
+			await interaction.editReply({
+				embeds: [replyEmbed.toJSON()]
 			})
 		}
 	}

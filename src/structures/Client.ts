@@ -61,7 +61,11 @@ export default class Client extends BaseClient<true> {
 	}
 
 	public async start() {
-		await this.prisma.$connect()
-		await this.login(process.env.BOT_TOKEN!)
+		try {
+			await this.prisma.$connect()
+			await this.login(process.env.BOT_TOKEN!)
+		} catch (error) {
+			console.error(error)
+		}
 	}
 }

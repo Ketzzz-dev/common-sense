@@ -2,15 +2,15 @@ import { Colors, EmbedBuilder, PermissionsBitField } from 'discord.js'
 import Command, { Options } from '../../structures/Command'
 
 export default {
-	name: 'warn', description: 'Warns a user in DMs and deducts their reputation.',
-	memberPerms: [PermissionsBitField.Flags.ModerateMembers],
+	name: 'kick', description: 'Kicks a member.',
+	memberPerms: [PermissionsBitField.Flags.KickMembers],
 	options: [
-		Options.user('member', 'The member to warn.', true),
-		Options.string('reason', 'The reason.', true, 1)
+		Options.user('member', 'The member to kick.', true),
+		Options.string('reason', 'The reason.', false, 1)
 	],
 	async execute(client, interaction) {
 		const member = interaction.options.getMember('member')
-		const reason = interaction.options.getString('reason', true)
+		const reason = interaction.options.getString('reason') ?? 'No reason.'
 
 		const errorEmbed = new EmbedBuilder()
 			.setColor(Colors.Greyple)
@@ -26,7 +26,7 @@ export default {
 		else if (member.id === interaction.member.id)
 			return await interaction.reply({
 				embeds: [
-					errorEmbed.setDescription('You can\'t warn yourself, silly.')
+					errorEmbed.setDescription('You can\'t kick yourself, silly.')
 						.toJSON()
 				],
 				ephemeral: true
@@ -34,7 +34,7 @@ export default {
 		else if (member.id === client.user.id)
 			return await interaction.reply({
 				embeds: [
-					errorEmbed.setDescription('You can\'t warn me, silly.')
+					errorEmbed.setDescription('You can\'t kick me, silly.')
 						.toJSON()
 				],
 				ephemeral: true
@@ -42,25 +42,28 @@ export default {
 		else if (member.roles.highest.position >= interaction.member.roles.highest.position)
 			return await interaction.reply({
 				embeds: [
-					errorEmbed.setDescription('You can\'t warn members with the same or higher role than you.')
+					errorEmbed.setDescription('You can\'t kick members with the same or higher role than you.')
 						.toJSON()
 				],
 				ephemeral: true
 			})
-		else if (!member.moderatable)
+		else if (!member.kickable)
 			return await interaction.reply({
 				embeds: [
-					errorEmbed.setDescription('I cannot moderate this member.')
+					errorEmbed.setDescription('I cannot kick this member.')
 						.toJSON()
 				],
 				ephemeral: true
 			})
+
+
+		const emoji = client.emojis.cache.get('1106557780858515466')!
 
 		try {
 			await interaction.deferReply()
 
 			const dmEmbed = new EmbedBuilder().setColor(client.color)
-				.setTitle(`:warning: You have been warned in ${interaction.guild.name}!`)
+				.setTitle(`${emoji} You have been kicked from ${interaction.guild.name}!`)
 				.setDescription(reason)
 				.setTimestamp()
 
@@ -78,8 +81,9 @@ export default {
 				ephemeral: true
 			})
 		} finally {
+			const kicked = await member.kick(reason)
 			const replyEmbed = new EmbedBuilder().setColor(client.color)
-				.setDescription(`:warning: ${member} has been warned!`)
+				.setDescription(`${emoji} ${member} has been kicked!`)
 
 			let guild = await client.prisma.guild.findUnique({
 				where: { id: interaction.guildId }
@@ -94,8 +98,8 @@ export default {
 
 			guild.cases.push({
 				id: guild.nextCaseId,
-				reason, user: member.id, mod: interaction.member.id,
-				action: 'WARN'
+				reason, user: kicked.id, mod: interaction.member.id,
+				action: 'KICK'
 			})
 
 			await client.prisma.guild.update({
