@@ -78,24 +78,12 @@ export default {
 				ephemeral: true
 			})
 		} finally {
-			const replyEmbed = new EmbedBuilder().setColor(client.color)
-				.setDescription(`:warning: ${member} has been warned!`)
-
-			let guild = await client.prisma.guild.findUnique({
-				where: { id: interaction.guildId }
-			})
-
-			if (!guild)
-				guild = await client.prisma.guild.create({
-					data: {
-						id: interaction.guildId
-					}
-				})
+			const guild = await client.getGuildModel(interaction.guildId)
 
 			guild.cases.push({
 				id: guild.nextCaseId,
 				reason, user: member.id, mod: interaction.member.id,
-				action: 'WARN'
+				action: 'WARN', date: new Date()
 			})
 
 			await client.prisma.guild.update({
@@ -105,6 +93,12 @@ export default {
 					cases: guild.cases
 				}
 			})
+
+			const replyEmbed = new EmbedBuilder().setColor(client.color)
+				.setDescription(`:warning: ${member} has been warned!`)
+				.setFooter({ text: `Case ID: ${guild.nextCaseId}` })
+				.setTimestamp()
+
 			await interaction.editReply({
 				embeds: [replyEmbed.toJSON()]
 			})

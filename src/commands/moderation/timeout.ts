@@ -5,6 +5,7 @@ import Command, { Options } from '../../structures/Command'
 export default {
 	name: 'timeout', description: 'Times a member out and deducts their reputation.',
 	memberPerms: [PermissionsBitField.Flags.ModerateMembers],
+	botPerms: [PermissionsBitField.Flags.ModerateMembers],
 	options: [
 		Options.user('member', 'The member to timeout.', true),
 		Options.string('length', 'The duration of the timeout.', true),
@@ -112,24 +113,12 @@ export default {
 			})
 		} finally {
 			const timed = await member.timeout(time, reason)
-			const replyEmbed = new EmbedBuilder().setColor(client.color)
-				.setDescription(`${emoji} ${member} has been timed out for ${duration}!`)
-
-			let guild = await client.prisma.guild.findUnique({
-				where: { id: interaction.guildId }
-			})
-
-			if (!guild)
-				guild = await client.prisma.guild.create({
-					data: {
-						id: interaction.guildId
-					}
-				})
+			const guild = await client.getGuildModel(interaction.guildId)
 
 			guild.cases.push({
 				id: guild.nextCaseId,
 				reason, user: timed.id, mod: interaction.member.id,
-				action: 'TIMEOUT'
+				action: 'TIMEOUT', date: new Date()
 			})
 
 			await client.prisma.guild.update({
@@ -139,6 +128,12 @@ export default {
 					cases: guild.cases
 				}
 			})
+
+			const replyEmbed = new EmbedBuilder().setColor(client.color)
+				.setDescription(`${emoji} ${member} has been timed out for ${duration}!`)
+				.setFooter({ text: `Case ID: ${guild.nextCaseId}` })
+				.setTimestamp()
+
 			await interaction.editReply({
 				embeds: [replyEmbed.toJSON()]
 			})

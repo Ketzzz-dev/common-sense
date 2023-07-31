@@ -2,31 +2,32 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
 }
 
 model Guild {
-  id         String @id @map("_id")
-  nextCaseId Int    @default(1)
-  cases      Case[]
+    id         String @id @map("_id")
+    nextCaseId Int    @default(1)
+    cases      Case[]
 }
 
 type Case {
-  id     Int
-  action Action
-  user   String
-  mod    String
-  reason String
+    id     Int
+    action Action
+    user   String
+    mod    String
+    reason String
+    date   DateTime
 }
 
 enum Action {
-  BAN
-  KICK
-  TIMEOUT
-  WARN
+    BAN
+    KICK
+    TIMEOUT
+    WARN
 }

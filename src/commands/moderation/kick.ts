@@ -4,6 +4,7 @@ import Command, { Options } from '../../structures/Command'
 export default {
 	name: 'kick', description: 'Kicks a member.',
 	memberPerms: [PermissionsBitField.Flags.KickMembers],
+	botPerms: [PermissionsBitField.Flags.KickMembers],
 	options: [
 		Options.user('member', 'The member to kick.', true),
 		Options.string('reason', 'The reason.', false, 1)
@@ -82,24 +83,12 @@ export default {
 			})
 		} finally {
 			const kicked = await member.kick(reason)
-			const replyEmbed = new EmbedBuilder().setColor(client.color)
-				.setDescription(`${emoji} ${member} has been kicked!`)
-
-			let guild = await client.prisma.guild.findUnique({
-				where: { id: interaction.guildId }
-			})
-
-			if (!guild)
-				guild = await client.prisma.guild.create({
-					data: {
-						id: interaction.guildId
-					}
-				})
+			const guild = await client.getGuildModel(interaction.guildId)
 
 			guild.cases.push({
 				id: guild.nextCaseId,
 				reason, user: kicked.id, mod: interaction.member.id,
-				action: 'KICK'
+				action: 'KICK', date: new Date()
 			})
 
 			await client.prisma.guild.update({
@@ -109,6 +98,12 @@ export default {
 					cases: guild.cases
 				}
 			})
+
+			const replyEmbed = new EmbedBuilder().setColor(client.color)
+				.setDescription(`${emoji} ${member} has been kicked!`)
+				.setFooter({ text: `Case ID: ${guild.nextCaseId}` })
+				.setTimestamp()
+
 			await interaction.editReply({
 				embeds: [replyEmbed.toJSON()]
 			})

@@ -1,10 +1,10 @@
 import { REST } from '@discordjs/rest'
-import { ActivityType, Client as BaseClient, Collection, IntentsBitField, Routes } from 'discord.js'
+import { ActivityType, Client as BaseClient, Collection, IntentsBitField, Routes, Snowflake } from 'discord.js'
 import { readdir } from 'fs/promises'
 import path from 'path'
 import Command from './Command'
 import Event from './Event'
-import { PrismaClient } from '@prisma/client'
+import { Guild, PrismaClient } from '@prisma/client'
 
 export default class Client extends BaseClient<true> {
 	public readonly color = 0xf47333
@@ -22,6 +22,15 @@ export default class Client extends BaseClient<true> {
 		})
 	}
 
+	public async getGuildModel(id: Snowflake): Promise<Guild> {
+		let guild = await this.prisma.guild.findUnique({
+			where: { id }
+		})
+
+		return guild ?? await this.prisma.guild.create({
+			data: { id }
+		})
+	}
 
 	public async loadCommands() {
 		const categories = await readdir(path.join(__dirname, '../commands'))

@@ -4,6 +4,7 @@ import Command, { Options } from '../../structures/Command'
 export default {
 	name: 'ban', description: 'Bans a member permanently.',
 	memberPerms: [PermissionsBitField.Flags.BanMembers],
+	botPerms: [PermissionsBitField.Flags.BanMembers],
 	options: [
 		Options.user('member', 'The member to ban.', true),
 		Options.string('reason', 'The reason.', false, 1)
@@ -81,24 +82,12 @@ export default {
 			})
 		} finally {
 			const banned = await member.ban({ reason, deleteMessageSeconds: 604800 })
-			const replyEmbed = new EmbedBuilder().setColor(client.color)
-				.setDescription(`${emoji} ${banned} has been banned!`)
-
-			let guild = await client.prisma.guild.findUnique({
-				where: { id: interaction.guildId }
-			})
-
-			if (!guild)
-				guild = await client.prisma.guild.create({
-					data: {
-						id: interaction.guildId
-					}
-				})
+			const guild = await client.getGuildModel(interaction.guildId)
 
 			guild.cases.push({
 				id: guild.nextCaseId,
 				reason, user: banned.id, mod: interaction.member.id,
-				action: 'BAN'
+				action: 'BAN', date: new Date()
 			})
 
 			await client.prisma.guild.update({
@@ -108,6 +97,11 @@ export default {
 					cases: guild.cases
 				}
 			})
+
+			const replyEmbed = new EmbedBuilder().setColor(client.color)
+				.setDescription(`${emoji} ${banned} has been banned!`)
+				.setFooter({ text: `Case ID: ${guild.nextCaseId}` })
+				.setTimestamp()
 
 			await interaction.editReply({
 				embeds: [replyEmbed.toJSON()]
